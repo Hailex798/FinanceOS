@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Finance OS - Analytics</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#ffdad7",
+                        "surface-container-highest": "#343439",
+                        "outline": "#908fa0",
+                        "surface-bright": "#38393e",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#ff5451",
+                        "secondary-container": "#00a572",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface": "#121317",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "on-primary-container": "#0d0096",
+                        "surface-tint": "#c0c1ff",
+                        "surface-container-low": "#1a1b20",
+                        "surface-dim": "#121317",
+                        "surface-container-high": "#292a2e",
+                        "tertiary": "#ffb3ad",
+                        "on-secondary": "#003824",
+                        "primary-container": "#8083ff",
+                        "outline-variant": "#464554",
+                        "primary": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "secondary": "#4edea3",
+                        "on-surface-variant": "#c7c4d7",
+                        "secondary-fixed": "#6ffbbe",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e1e0ff",
+                        "background": "#121317",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "inverse-primary": "#494bd6",
+                        "on-secondary-container": "#00311f",
+                        "on-tertiary-container": "#5c0008",
+                        "on-error": "#690005",
+                        "on-background": "#e3e2e8",
+                        "on-surface": "#e3e2e8",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#343439",
+                        "surface-container": "#1f1f24",
+                        "surface-container-lowest": "#0d0e12",
+                        "on-primary-fixed": "#07006c",
+                        "on-secondary-fixed": "#002113",
+                        "inverse-on-surface": "#2f3035",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary": "#68000a",
+                        "inverse-surface": "#e3e2e8",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#410004"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .glass-card {
+            background: rgba(31, 31, 36, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+    </style>
+</head>
+
+<body class="bg-surface-container-lowest text-on-surface antialiased selection:bg-primary/30">
+    <!-- SideNavBar -->
+    <aside
+        class="fixed left-0 top-0 h-full w-[64px] z-50 bg-[#0d0e12] dark:bg-[#0d0e12] border-r border-white/10 flex flex-col items-center py-6 gap-8 font-sans antialiased tabular-nums text-sm font-medium tracking-tight">
+        <div class="w-8 h-8 rounded bg-primary flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-on-primary text-xl"
+                data-icon="account_balance_wallet">account_balance_wallet</span>
+        </div>
+        <nav class="flex flex-col gap-2 w-full">
+            <a class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 scale-95 active:scale-90 transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            </a>
+            <a class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 scale-95 active:scale-90 transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="Table_Chart">table_chart</span>
+            </a>
+            <a class="text-[#6366F1] border-l-2 border-[#6366F1] flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 scale-95 active:scale-90 transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="analytics"
+                    style="font-variation-settings: 'FILL' 1;">analytics</span>
+            </a>
+            <a class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 scale-95 active:scale-90 transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="payments">payments</span>
+            </a>
+            <a class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 scale-95 active:scale-90 transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+            </a>
+        </nav>
+        <div class="mt-auto flex flex-col gap-4">
+            <a class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 scale-95 active:scale-90 transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+            </a>
+        </div>
+    </aside>
+    <!-- TopNavBar -->
+    <header
+        class="fixed top-0 right-0 left-[64px] h-16 z-40 bg-[#121317]/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-8 w-full font-sans tabular-nums text-sm font-semibold tracking-wide">
+        <div class="flex items-center gap-4">
+            <span class="text-lg font-bold tracking-tighter text-white uppercase">Finance OS</span>
+            <div class="h-4 w-[1px] bg-outline-variant mx-2"></div>
+            <span class="text-on-surface-variant font-medium">Analytics Engine</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <div
+                class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded border border-white/5 cursor-pointer hover:bg-surface-variant transition-colors">
+                <span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                <span class="text-xs uppercase tracking-widest text-on-surface-variant">Aug 01 - Aug 31</span>
+            </div>
+            <button
+                class="bg-primary text-on-primary px-4 py-1.5 rounded flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_12px_rgba(192,193,255,0.3)] transition-all active:scale-95">
+                <span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                Export
+            </button>
+            <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                <span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white"
+                    data-icon="notifications">notifications</span>
+                <div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20 bg-surface-container-high">
+                    <img alt="User Avatar" class="w-full h-full object-cover"
+                        data-alt="minimalist flat avatar of a young professional with dark hair and glasses on a dark background"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtBUQMkATbQAnpnOibttcU4jA2Dt2ZnW0_J_0Zl9J8dyPbrWjmS8MAuRZIeqMu7q1BivZ_eABMo1WnNjVHVqiAoeTQ_h_pu8t9HXfS5bu7hX54IQDpMGjn276_ng2rO3nCDbVGWevnByIujStx3BS0u3NSy1LD1mbO5gA3TF1lTZraU_YRYYlOzWjXRbt0QqWx17VaF3jBYBnYnDC8VAW7LghrnSzemqKEsTkjg6BtNIOIgQDDFRJsOtu6ToQtYbuuYJ0Ghc1HkVpv" />
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content Canvas -->
+    <main class="ml-[64px] pt-16 min-h-screen p-8 space-y-8">
+        <!-- Full-width monthly comparison bar chart -->
+        <section class="glass-card rounded-xl p-8">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-on-surface-variant text-xs font-bold uppercase tracking-[0.2em] mb-1">Monthly
+                        Performance</h2>
+                    <p class="text-2xl font-semibold tracking-tight tabular-nums">Budget vs. Actual Spent</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-sm bg-primary/20 border border-primary"></div>
+                        <span class="text-xs text-on-surface-variant">Budgeted</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-sm bg-primary shadow-[0_0_8px_rgba(192,193,255,0.4)]"></div>
+                        <span class="text-xs text-on-surface-variant">Spent</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Custom CSS Bar Chart Visualization -->
+            <div class="h-64 flex items-end justify-between gap-4 px-4 border-b border-white/5 pb-2">
+                <!-- Mar -->
+                <div class="flex-1 flex flex-col items-center gap-1 group">
+                    <div class="w-full flex justify-center items-end gap-1 h-full">
+                        <div class="w-1/3 bg-primary/10 h-[60%] rounded-t-sm border-x border-t border-primary/20"></div>
+                        <div
+                            class="w-1/3 bg-primary h-[55%] rounded-t-sm shadow-[0_0_15px_rgba(192,193,255,0.1)] group-hover:brightness-125 transition-all">
+                        </div>
+                    </div>
+                    <span
+                        class="text-[10px] text-on-surface-variant uppercase mt-2 font-bold tracking-widest">Mar</span>
+                </div>
+                <!-- Apr -->
+                <div class="flex-1 flex flex-col items-center gap-1 group">
+                    <div class="w-full flex justify-center items-end gap-1 h-full">
+                        <div class="w-1/3 bg-primary/10 h-[70%] rounded-t-sm border-x border-t border-primary/20"></div>
+                        <div
+                            class="w-1/3 bg-primary h-[68%] rounded-t-sm shadow-[0_0_15px_rgba(192,193,255,0.1)] group-hover:brightness-125 transition-all">
+                        </div>
+                    </div>
+                    <span
+                        class="text-[10px] text-on-surface-variant uppercase mt-2 font-bold tracking-widest">Apr</span>
+                </div>
+                <!-- May -->
+                <div class="flex-1 flex flex-col items-center gap-1 group">
+                    <div class="w-full flex justify-center items-end gap-1 h-full">
+                        <div class="w-1/3 bg-primary/10 h-[65%] rounded-t-sm border-x border-t border-primary/20"></div>
+                        <div
+                            class="w-1/3 bg-primary h-[75%] rounded-t-sm shadow-[0_0_20px_rgba(255,179,173,0.3)] bg-tertiary-container group-hover:brightness-125 transition-all">
+                        </div>
+                    </div>
+                    <span
+                        class="text-[10px] text-on-surface-variant uppercase mt-2 font-bold tracking-widest">May</span>
+                </div>
+                <!-- Jun -->
+                <div class="flex-1 flex flex-col items-center gap-1 group">
+                    <div class="w-full flex justify-center items-end gap-1 h-full">
+                        <div class="w-1/3 bg-primary/10 h-[80%] rounded-t-sm border-x border-t border-primary/20"></div>
+                        <div
+                            class="w-1/3 bg-primary h-[40%] rounded-t-sm shadow-[0_0_15px_rgba(192,193,255,0.1)] group-hover:brightness-125 transition-all">
+                        </div>
+                    </div>
+                    <span
+                        class="text-[10px] text-on-surface-variant uppercase mt-2 font-bold tracking-widest">Jun</span>
+                </div>
+                <!-- Jul -->
+                <div class="flex-1 flex flex-col items-center gap-1 group">
+                    <div class="w-full flex justify-center items-end gap-1 h-full">
+                        <div class="w-1/3 bg-primary/10 h-[75%] rounded-t-sm border-x border-t border-primary/20"></div>
+                        <div
+                            class="w-1/3 bg-primary h-[72%] rounded-t-sm shadow-[0_0_15px_rgba(192,193,255,0.1)] group-hover:brightness-125 transition-all">
+                        </div>
+                    </div>
+                    <span
+                        class="text-[10px] text-on-surface-variant uppercase mt-2 font-bold tracking-widest">Jul</span>
+                </div>
+                <!-- Aug (Current) -->
+                <div class="flex-1 flex flex-col items-center gap-1 group">
+                    <div class="w-full flex justify-center items-end gap-1 h-full">
+                        <div class="w-1/3 bg-primary/10 h-[90%] rounded-t-sm border-x border-t border-primary/20"></div>
+                        <div
+                            class="w-1/3 bg-primary h-[82%] rounded-t-sm shadow-[0_0_20px_rgba(192,193,255,0.4)] group-hover:brightness-125 transition-all">
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-primary uppercase mt-2 font-extrabold tracking-widest">Aug</span>
+                </div>
+            </div>
+        </section>
+        <!-- Bento Grid 3 Sections -->
+        <div class="grid grid-cols-12 gap-8">
+            <!-- 1. Category Breakdown Donut -->
+            <div class="col-span-12 lg:col-span-4 glass-card rounded-xl p-6 flex flex-col">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6">Allocation by
+                    Category</h3>
+                <div class="flex-grow flex items-center justify-center relative">
+                    <!-- SVG Donut Chart Simulation -->
+                    <svg class="w-48 h-48 transform -rotate-90">
+                        <circle class="text-surface-container-high" cx="96" cy="96" fill="transparent" r="80"
+                            stroke="currentColor" stroke-width="12"></circle>
+                        <circle class="text-primary" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor"
+                            stroke-dasharray="502" stroke-dashoffset="150" stroke-width="12"></circle>
+                        <circle class="text-secondary" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor"
+                            stroke-dasharray="502" stroke-dashoffset="350" stroke-width="12"></circle>
+                        <circle class="text-tertiary" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor"
+                            stroke-dasharray="502" stroke-dashoffset="450" stroke-width="12"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-2xl font-bold tracking-tighter tabular-nums">$12,450</span>
+                        <span class="text-[10px] text-on-surface-variant uppercase tracking-widest">Total Spent</span>
+                    </div>
+                </div>
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-primary"></div>
+                        <span class="text-xs text-on-surface-variant">SaaS &amp; Infrastructure</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-secondary"></div>
+                        <span class="text-xs text-on-surface-variant">Marketing</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-tertiary"></div>
+                        <span class="text-xs text-on-surface-variant">Operations</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-surface-container-highest"></div>
+                        <span class="text-xs text-on-surface-variant">Miscellaneous</span>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Tax Summary Card -->
+            <div class="col-span-12 lg:col-span-4 glass-card rounded-xl p-6 flex flex-col">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6">Tax Liability
+                    Summary</h3>
+                <div class="space-y-4 flex-grow">
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-on-surface-variant"
+                                data-icon="receipt_long">receipt_long</span>
+                            <span class="text-sm font-medium">GST Collected (Output)</span>
+                        </div>
+                        <span class="text-sm font-bold tabular-nums text-secondary">+$4,210.50</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-on-surface-variant"
+                                data-icon="account_balance">account_balance</span>
+                            <span class="text-sm font-medium">TDS Deducted</span>
+                        </div>
+                        <span class="text-sm font-bold tabular-nums text-tertiary">-$890.00</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-on-surface-variant"
+                                data-icon="input">input</span>
+                            <span class="text-sm font-medium">Input Tax Credit</span>
+                        </div>
+                        <span class="text-sm font-bold tabular-nums text-primary">+$1,120.25</span>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t border-primary/20">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] text-on-surface-variant uppercase tracking-[0.2em] font-bold">
+                                Estimated Payable</p>
+                            <p class="text-3xl font-extrabold tracking-tighter tabular-nums">$2,199.75</p>
+                        </div>
+                        <div
+                            class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded border border-primary/20">
+                            Q3 ESTIMATE
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 3. Spending Anomalies Alert Feed -->
+            <div class="col-span-12 lg:col-span-4 glass-card rounded-xl p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Anomalies Detected
+                    </h3>
+                    <span class="flex h-2 w-2 rounded-full bg-tertiary animate-pulse"></span>
+                </div>
+                <div class="space-y-4 flex-grow overflow-y-auto max-h-[300px] pr-2">
+                    <!-- Anomaly Item -->
+                    <div
+                        class="p-4 bg-tertiary/5 border-l-2 border-tertiary rounded-r-lg group hover:bg-tertiary/10 transition-colors">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs font-bold text-tertiary uppercase tracking-wider">High Frequency</span>
+                            <span class="text-[10px] text-on-surface-variant tabular-nums">TODAY, 14:20</span>
+                        </div>
+                        <p class="text-sm font-semibold mb-1">AWS - Cloudfront Usage</p>
+                        <p class="text-xs text-on-surface-variant line-clamp-2">Spending increased by 450% compared to
+                            average daily usage for this period.</p>
+                    </div>
+                    <!-- Anomaly Item -->
+                    <div
+                        class="p-4 bg-surface-container-high border-l-2 border-primary/40 rounded-r-lg group hover:bg-surface-variant transition-colors">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs font-bold text-primary uppercase tracking-wider">Duplicate
+                                Record</span>
+                            <span class="text-[10px] text-on-surface-variant tabular-nums">AUG 12</span>
+                        </div>
+                        <p class="text-sm font-semibold mb-1">Stripe Payout Ref#9920</p>
+                        <p class="text-xs text-on-surface-variant">Potential duplicate payout detected for invoice
+                            ID-442-B. Manual review suggested.</p>
+                    </div>
+                    <!-- Anomaly Item -->
+                    <div
+                        class="p-4 bg-surface-container-high border-l-2 border-secondary/40 rounded-r-lg group hover:bg-surface-variant transition-colors">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs font-bold text-secondary uppercase tracking-wider">New Vendor</span>
+                            <span class="text-[10px] text-on-surface-variant tabular-nums">AUG 10</span>
+                        </div>
+                        <p class="text-sm font-semibold mb-1">Midjourney Subscription</p>
+                        <p class="text-xs text-on-surface-variant">New high-tier subscription initiated outside of
+                            approved procurement flow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bottom: Daily spend line chart -->
+        <section class="glass-card rounded-xl p-8">
+            <div class="flex justify-between items-center mb-10">
+                <div>
+                    <h2 class="text-on-surface-variant text-xs font-bold uppercase tracking-[0.2em] mb-1">Daily Burn
+                        Rate</h2>
+                    <p class="text-xl font-semibold tracking-tight">August Transaction Flux</p>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="px-3 py-1 rounded bg-surface-container-high text-[10px] font-bold uppercase tracking-widest text-on-surface-variant border border-white/5">Show
+                        Weekends</button>
+                    <button
+                        class="px-3 py-1 rounded bg-surface-container-high text-[10px] font-bold uppercase tracking-widest text-on-surface-variant border border-white/5">Normalize
+                        Data</button>
+                </div>
+            </div>
+            <!-- Line Chart Simulation -->
+            <div class="relative h-48 w-full">
+                <!-- Grid Lines -->
+                <div class="absolute inset-0 flex flex-col justify-between">
+                    <div class="w-full h-[1px] bg-white/5"></div>
+                    <div class="w-full h-[1px] bg-white/5"></div>
+                    <div class="w-full h-[1px] bg-white/5"></div>
+                    <div class="w-full h-[1px] bg-white/5"></div>
+                </div>
+                <!-- SVG Line Graph -->
+                <svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none"
+                    viewbox="0 0 1000 100">
+                    <defs>
+                        <lineargradient id="lineGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                            <stop offset="0%" stop-color="#c0c1ff"></stop>
+                            <stop offset="50%" stop-color="#4edea3"></stop>
+                            <stop offset="100%" stop-color="#c0c1ff"></stop>
+                        </lineargradient>
+                    </defs>
+                    <path
+                        d="M0,80 L50,75 L100,85 L150,40 L200,45 L250,90 L300,88 L350,30 L400,25 L450,70 L500,75 L550,85 L600,10 L650,15 L700,60 L750,65 L800,80 L850,75 L900,20 L950,25 L1000,60"
+                        fill="none" stroke="url(#lineGradient)" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="3"></path>
+                    <!-- Highlight Dots for Weekends -->
+                    <circle cx="250" cy="90" fill="#ffb3ad" r="4"></circle>
+                    <circle cx="300" cy="88" fill="#ffb3ad" r="4"></circle>
+                    <circle cx="750" cy="65" fill="#ffb3ad" r="4"></circle>
+                    <circle cx="800" cy="80" fill="#ffb3ad" r="4"></circle>
+                </svg>
+                <!-- X-Axis Labels -->
+                <div
+                    class="absolute -bottom-8 left-0 right-0 flex justify-between px-2 text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">
+                    <span>Aug 01</span>
+                    <span>Aug 05</span>
+                    <span class="text-tertiary">Aug 09 (WKND)</span>
+                    <span>Aug 13</span>
+                    <span>Aug 17</span>
+                    <span>Aug 21</span>
+                    <span class="text-tertiary">Aug 25 (WKND)</span>
+                    <span>Aug 29</span>
+                </div>
+            </div>
+            <div class="mt-16 flex items-center gap-8 px-4 py-4 bg-surface-container-low rounded border border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-tertiary"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Weekend
+                        Volatility Highlights</span>
+                </div>
+                <p class="text-xs text-on-surface-variant leading-relaxed">
+                    Average transaction volume drops by <span class="text-secondary font-bold tabular-nums">34%</span>
+                    during non-business hours, with peak processing observed on Tuesday mornings at 09:30 UTC.
+                </p>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

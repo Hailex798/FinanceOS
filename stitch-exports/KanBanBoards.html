@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#ffdad7",
+                        "surface-container-highest": "#343439",
+                        "outline": "#908fa0",
+                        "surface-bright": "#38393e",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#ff5451",
+                        "secondary-container": "#00a572",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface": "#121317",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "on-primary-container": "#0d0096",
+                        "surface-tint": "#c0c1ff",
+                        "surface-container-low": "#1a1b20",
+                        "surface-dim": "#121317",
+                        "surface-container-high": "#292a2e",
+                        "tertiary": "#ffb3ad",
+                        "on-secondary": "#003824",
+                        "primary-container": "#8083ff",
+                        "outline-variant": "#464554",
+                        "primary": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "secondary": "#4edea3",
+                        "on-surface-variant": "#c7c4d7",
+                        "secondary-fixed": "#6ffbbe",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e1e0ff",
+                        "background": "#121317",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "inverse-primary": "#494bd6",
+                        "on-secondary-container": "#00311f",
+                        "on-tertiary-container": "#5c0008",
+                        "on-error": "#690005",
+                        "on-background": "#e3e2e8",
+                        "on-surface": "#e3e2e8",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#343439",
+                        "surface-container": "#1f1f24",
+                        "surface-container-lowest": "#0d0e12",
+                        "on-primary-fixed": "#07006c",
+                        "on-secondary-fixed": "#002113",
+                        "inverse-on-surface": "#2f3035",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary": "#68000a",
+                        "inverse-surface": "#e3e2e8",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#410004"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0e12;
+            color: #e3e2e8;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-card {
+            background: rgba(31, 31, 36, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="antialiased font-body overflow-hidden">
+    <!-- SideNavBar (64px Fixed) -->
+    <aside
+        class="fixed left-0 top-0 h-full w-[64px] z-50 bg-[#0d0e12] dark:bg-[#0d0e12] border-r border-white/10 flex flex-col items-center py-6 gap-8 font-sans antialiased tabular-nums text-sm font-medium tracking-tight">
+        <div class="flex flex-col items-center gap-8 w-full">
+            <div class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 cursor-pointer w-full"
+                title="Dashboard">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            </div>
+            <div class="text-[#6366F1] border-l-2 border-[#6366F1] flex items-center justify-center py-4 bg-white/5 transition-colors duration-200 cursor-pointer w-full"
+                title="Boards">
+                <span class="material-symbols-outlined" data-icon="Table_Chart">table_chart</span>
+            </div>
+            <div class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 cursor-pointer w-full"
+                title="Analytics">
+                <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+            </div>
+            <div class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 cursor-pointer w-full"
+                title="Investments">
+                <span class="material-symbols-outlined" data-icon="payments">payments</span>
+            </div>
+            <div class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 cursor-pointer w-full"
+                title="AI Insights">
+                <span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+            </div>
+        </div>
+        <div class="mt-auto w-full flex flex-col items-center gap-4">
+            <div class="text-slate-500 hover:text-slate-300 flex items-center justify-center py-4 hover:bg-white/5 transition-colors duration-200 cursor-pointer w-full"
+                title="Settings">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+            </div>
+        </div>
+    </aside>
+    <!-- TopNavBar -->
+    <header
+        class="fixed top-0 right-0 left-[64px] h-16 z-40 bg-[#121317]/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-8 w-full font-sans tabular-nums text-sm font-semibold tracking-wide">
+        <div class="flex items-center gap-4">
+            <span class="text-lg font-bold tracking-tighter text-white uppercase">Finance OS</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <button class="text-slate-400 hover:text-white transition-colors duration-200 flex items-center gap-2">
+                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+            </button>
+            <div class="h-8 w-8 rounded-full overflow-hidden border border-white/10">
+                <img alt="User Avatar" class="w-full h-full object-cover"
+                    data-alt="close up professional portrait of a tech executive in a dark environment with moody teal and violet rim lighting"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVAw6Pdj4YtyBgrdP9M8WyMWEc3A9fPtFni9ONYemyz5AbSTtDx9mr4UR3GCtApJp_MpU8D-ISTk9dFtHowLcKqKS5uDjCQgtZcRPJ7WWJsYmdgcuOCHgqDO3vTSSm9nBBhiipdswJh1ipKrU4GpfastvI0nEM7_iZeNDYtPxpLQhhf0YKOafYc8QeG9ZGcVgpHvRD8droXjNH09F4ki9Xur44GsmXZd73m9Nzvhg_odrEedc9E_SUYgrGnYmcd1ZgzGBim_hQGqCL" />
+            </div>
+        </div>
+    </header>
+    <!-- Main Canvas -->
+    <main class="pl-[64px] pt-16 min-h-screen bg-surface-container-lowest">
+        <!-- Dashboard Header Context -->
+        <div class="px-8 py-8 flex flex-col gap-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex flex-col">
+                    <h1 class="text-3xl font-extrabold tracking-tight text-on-surface">Financial Overview</h1>
+                    <p class="text-on-surface-variant text-sm font-medium uppercase tracking-widest mt-1">Operational
+                        Workspace / Boards</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div
+                        class="bg-surface-container flex items-center px-3 py-2 rounded-lg border border-white/5 cursor-pointer hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined text-primary text-sm mr-2"
+                            data-icon="calendar_month">calendar_month</span>
+                        <span class="text-sm font-semibold">October 2023</span>
+                        <span class="material-symbols-outlined text-sm ml-2" data-icon="expand_more">expand_more</span>
+                    </div>
+                    <button
+                        class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-transform">
+                        <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                        Add Expense
+                    </button>
+                </div>
+            </div>
+            <!-- Board Selector Tabs -->
+            <div class="flex items-center gap-1 border-b border-white/5">
+                <button class="px-6 py-3 text-sm font-bold border-b-2 border-primary text-primary transition-all">HDFC
+                    Savings</button>
+                <button
+                    class="px-6 py-3 text-sm font-semibold text-on-surface-variant hover:text-white hover:bg-white/5 transition-all">SBI
+                    Salary</button>
+                <button
+                    class="px-6 py-3 text-sm font-semibold text-on-surface-variant hover:text-white hover:bg-white/5 transition-all">ICICI
+                    Credit</button>
+                <button
+                    class="px-4 py-3 text-sm font-semibold text-primary/60 hover:text-primary transition-all flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-1" data-icon="add">add</span>
+                    Add
+                </button>
+            </div>
+            <!-- Kanban Grid -->
+            <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start h-[calc(100vh-320px)] overflow-y-auto pb-8 custom-scrollbar">
+                <!-- Column: Planned -->
+                <div class="flex flex-col gap-4 bg-surface-container-low/50 p-4 rounded-xl min-h-full">
+                    <div class="flex items-center justify-between px-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-outline"></span>
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Planned</h3>
+                            <span
+                                class="bg-surface-container-high px-2 py-0.5 rounded text-[10px] tabular-nums font-bold text-on-surface-variant">4</span>
+                        </div>
+                        <span class="material-symbols-outlined text-sm text-on-surface-variant cursor-pointer"
+                            data-icon="more_horiz">more_horiz</span>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <!-- Card 1 -->
+                        <div
+                            class="glass-card p-4 rounded-lg flex flex-col gap-3 hover:translate-y-[-2px] transition-all cursor-grab active:cursor-grabbing">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-on-surface leading-tight">Server Infrastructure</h4>
+                                <span class="tabular-nums font-bold text-primary">₹14,500.00</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary/10 text-secondary border border-secondary/20">OPERATIONS</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-on-surface-variant border border-white/10 uppercase">HDFC
+                                    Savings</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                <span class="text-[10px] font-medium text-on-surface-variant tabular-nums">12 OCT
+                                    2023</span>
+                                <span class="material-symbols-outlined text-sm text-on-surface-variant"
+                                    data-icon="attach_file">attach_file</span>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div
+                            class="glass-card p-4 rounded-lg flex flex-col gap-3 hover:translate-y-[-2px] transition-all cursor-grab active:cursor-grabbing">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-on-surface leading-tight">Quarterly Office Rent</h4>
+                                <span class="tabular-nums font-bold text-primary">₹85,000.00</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary/10 text-secondary border border-secondary/20">FIXED</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-on-surface-variant border border-white/10 uppercase">HDFC
+                                    Savings</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[10px]"
+                                        data-icon="receipt_long">receipt_long</span>
+                                    18% GST
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                <span class="text-[10px] font-medium text-on-surface-variant tabular-nums">15 OCT
+                                    2023</span>
+                            </div>
+                        </div>
+                        <button
+                            class="w-full py-4 border-2 border-dashed border-white/5 rounded-lg flex items-center justify-center text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all text-sm font-semibold gap-2">
+                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                            Add expense
+                        </button>
+                    </div>
+                </div>
+                <!-- Column: Spent -->
+                <div class="flex flex-col gap-4 bg-surface-container-low/50 p-4 rounded-xl min-h-full">
+                    <div class="flex items-center justify-between px-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Spent</h3>
+                            <span
+                                class="bg-surface-container-high px-2 py-0.5 rounded text-[10px] tabular-nums font-bold text-on-surface-variant">2</span>
+                        </div>
+                        <span class="material-symbols-outlined text-sm text-on-surface-variant cursor-pointer"
+                            data-icon="more_horiz">more_horiz</span>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <!-- Card Spent 1 -->
+                        <div
+                            class="glass-card p-4 rounded-lg flex flex-col gap-3 hover:translate-y-[-2px] transition-all cursor-grab active:cursor-grabbing border-l-4 border-l-secondary">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-on-surface leading-tight">Premium SaaS Suite</h4>
+                                <span class="tabular-nums font-bold text-primary">₹2,499.00</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary/10 text-secondary border border-secondary/20">SOFTWARE</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-on-surface-variant border border-white/10 uppercase">HDFC
+                                    Savings</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                <span class="text-[10px] font-medium text-on-surface-variant tabular-nums">04 OCT
+                                    2023</span>
+                                <span class="material-symbols-outlined text-sm text-secondary" data-icon="check_circle"
+                                    data-weight="fill">check_circle</span>
+                            </div>
+                        </div>
+                        <!-- Card Spent 2 -->
+                        <div
+                            class="glass-card p-4 rounded-lg flex flex-col gap-3 hover:translate-y-[-2px] transition-all cursor-grab active:cursor-grabbing border-l-4 border-l-secondary">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-on-surface leading-tight">Team Offsite Dinner</h4>
+                                <span class="tabular-nums font-bold text-primary">₹12,400.00</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary/10 text-secondary border border-secondary/20">ENTERTAINMENT</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-on-surface-variant border border-white/10 uppercase">HDFC
+                                    Savings</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[10px]"
+                                        data-icon="receipt_long">receipt_long</span>
+                                    5% GST
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                <span class="text-[10px] font-medium text-on-surface-variant tabular-nums">02 OCT
+                                    2023</span>
+                                <span class="material-symbols-outlined text-sm text-secondary" data-icon="check_circle"
+                                    data-weight="fill">check_circle</span>
+                            </div>
+                        </div>
+                        <button
+                            class="w-full py-4 border-2 border-dashed border-white/5 rounded-lg flex items-center justify-center text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all text-sm font-semibold gap-2">
+                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                            Add expense
+                        </button>
+                    </div>
+                </div>
+                <!-- Column: Recurring -->
+                <div class="flex flex-col gap-4 bg-surface-container-low/50 p-4 rounded-xl min-h-full">
+                    <div class="flex items-center justify-between px-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-primary"></span>
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Recurring
+                            </h3>
+                            <span
+                                class="bg-surface-container-high px-2 py-0.5 rounded text-[10px] tabular-nums font-bold text-on-surface-variant">1</span>
+                        </div>
+                        <span class="material-symbols-outlined text-sm text-on-surface-variant cursor-pointer"
+                            data-icon="more_horiz">more_horiz</span>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <!-- Card Recurring 1 -->
+                        <div
+                            class="glass-card p-4 rounded-lg flex flex-col gap-3 hover:translate-y-[-2px] transition-all cursor-grab active:cursor-grabbing">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-on-surface leading-tight">API Subscription Plan</h4>
+                                <span class="tabular-nums font-bold text-primary">₹8,900.00</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary/10 text-secondary border border-secondary/20">API</span>
+                                <span
+                                    class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-on-surface-variant border border-white/10 uppercase">HDFC
+                                    Savings</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px] text-primary"
+                                        data-icon="refresh">refresh</span>
+                                    <span
+                                        class="text-[10px] font-medium text-on-surface-variant uppercase">Monthly</span>
+                                </div>
+                                <span class="text-[10px] font-medium text-on-surface-variant tabular-nums">NEXT: 28
+                                    OCT</span>
+                            </div>
+                        </div>
+                        <button
+                            class="w-full py-4 border-2 border-dashed border-white/5 rounded-lg flex items-center justify-center text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all text-sm font-semibold gap-2">
+                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                            Add expense
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Bottom Notification (Floating) -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <div class="glass-card px-4 py-3 rounded-lg shadow-2xl flex items-center gap-4 border-primary/20">
+            <div class="w-8 h-8 rounded bg-secondary/20 flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-lg" data-icon="trending_up">trending_up</span>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-on-surface leading-none">Savings Insight</p>
+                <p class="text-[10px] text-on-surface-variant mt-1">You've saved 12% more than last month.</p>
+            </div>
+            <button class="ml-2 text-on-surface-variant hover:text-white">
+                <span class="material-symbols-outlined text-sm" data-icon="close">close</span>
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>
