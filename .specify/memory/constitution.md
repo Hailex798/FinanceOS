@@ -7,27 +7,27 @@
 
 ## 1. Technology Stack (Non-Negotiable)
 
-| Layer | Technology | Version Constraint |
-|---|---|---|
-| **Frontend framework** | Next.js 14 with **App Router** | ≥ 14.0 — **Pages Router is banned** |
-| **Language** | TypeScript — `strict: true` everywhere | ≥ 5.3 |
-| **Styling** | Tailwind CSS + shadcn/ui | Latest stable |
-| **Animations** | Framer Motion | ≥ 10.0 |
-| **Global state** | Zustand | ≥ 4.4 |
-| **Server state** | TanStack React Query | ≥ 5.0 |
-| **API layer** | tRPC (type-safe RPC) | ≥ 11.0 — no REST unless strictly necessary |
-| **Database** | PostgreSQL (Neon serverless or Supabase) | ≥ 15 |
-| **ORM** | Prisma | ≥ 5.7 |
-| **Cache** | Redis via Upstash | — |
-| **Background jobs** | BullMQ on Redis | ≥ 5.0 |
-| **Auth** | NextAuth.js v5 (Auth.js) | v5 beta+ — Google Provider + Credentials Provider |
-| **AI** | Anthropic Claude API (`claude-sonnet-4-20250514`) | — |
-| **Hosting (frontend)** | Vercel | — |
-| **Hosting (backend)** | Railway or AWS | — |
-| **Error tracking** | Sentry | Latest SDK |
-| **Logging** | Winston (structured JSON logs) | ≥ 3.11 |
-| **Unit testing** | Vitest | ≥ 1.0 |
-| **E2E testing** | Playwright | ≥ 1.40 |
+| Layer                  | Technology                                        | Version Constraint                                |
+| ---------------------- | ------------------------------------------------- | ------------------------------------------------- |
+| **Frontend framework** | Next.js 14 with **App Router**                    | ≥ 14.0 — **Pages Router is banned**               |
+| **Language**           | TypeScript — `strict: true` everywhere            | ≥ 5.3                                             |
+| **Styling**            | Tailwind CSS + shadcn/ui                          | Latest stable                                     |
+| **Animations**         | Framer Motion                                     | ≥ 10.0                                            |
+| **Global state**       | Zustand                                           | ≥ 4.4                                             |
+| **Server state**       | TanStack React Query                              | ≥ 5.0                                             |
+| **API layer**          | tRPC (type-safe RPC)                              | ≥ 11.0 — no REST unless strictly necessary        |
+| **Database**           | PostgreSQL (Neon serverless or Supabase)          | ≥ 15                                              |
+| **ORM**                | Prisma                                            | ≥ 5.7                                             |
+| **Cache**              | Redis via Upstash                                 | —                                                 |
+| **Background jobs**    | BullMQ on Redis                                   | ≥ 5.0                                             |
+| **Auth**               | NextAuth.js v5 (Auth.js)                          | v5 beta+ — Google Provider + Credentials Provider |
+| **AI**                 | Anthropic Claude API (`claude-sonnet-4-20250514`) | —                                                 |
+| **Hosting (frontend)** | Vercel                                            | —                                                 |
+| **Hosting (backend)**  | Railway or AWS                                    | —                                                 |
+| **Error tracking**     | Sentry                                            | Latest SDK                                        |
+| **Logging**            | Winston (structured JSON logs)                    | ≥ 3.11                                            |
+| **Unit testing**       | Vitest                                            | ≥ 1.0                                             |
+| **E2E testing**        | Playwright                                        | ≥ 1.40                                            |
 
 ### Stack Prohibitions
 
@@ -41,7 +41,21 @@
 
 ---
 
-## 2. Coding Standards
+## 2. Design System & Stitch Governance
+
+- **Single Source of Truth**: `/stitch-exports/*.html` and `specs/main/DESIGN.md` are the ONLY approved visual references. All UI must match these pixel-perfectly in layout, spacing, and hierarchy.
+- **STRICTLY FORBIDDEN**: Copying any HTML, CSS, or inline styles from Stitch exports. All code must use Tailwind utility classes + shadcn/ui components.
+- **MANDATORY WORKFLOW**: Before building any page, analyze the corresponding HTML export to understand structure, then map each element to shadcn/ui or custom Tailwind components.
+- **MCP INTEGRATION**: Agents MUST query Stitch MCP (`stitch://`) to validate component props, spacing values, and design tokens. Do not guess.
+- **Design Token Enforcement**: All colors, typography, spacing, border-radius, and shadows must come from `DESIGN.md`. No hardcoded values.
+- **Animation Rule**: Framer Motion must replicate the micro-interactions implied in the Stitch designs (card hover, page transitions, chart reveals).
+- **Responsive Requirement**: Mockups are desktop-first, but ALL implementations must be mobile-responsive (min 375px) while preserving the Stitch visual language.
+- **Component Precedence**: When a shadcn/ui component can achieve the Stitch design, it MUST be used. Custom components are only permitted when no shadcn/ui equivalent exists.
+- **Skeleton Loaders**: All dashboard data must use skeleton loaders that match the Stitch card layouts. Never show blank states — always show a structured skeleton that mirrors the final component dimensions.
+
+---
+
+## 3. Coding Standards
 
 ### TypeScript
 
@@ -53,17 +67,17 @@
 
 ### Naming Conventions
 
-| Construct | Convention | Example |
-|---|---|---|
-| Files (components) | `kebab-case.tsx` | `expense-card.tsx` |
-| Files (utilities) | `kebab-case.ts` | `format-currency.ts` |
-| React components | `PascalCase` | `ExpenseCard` |
-| Hooks | `camelCase` with `use` prefix | `useExpenses` |
-| Constants | `UPPER_SNAKE_CASE` | `MAX_BOARD_COUNT` |
-| Database models | `PascalCase` (Prisma) | `Expense`, `Board` |
-| tRPC routers | `camelCase` | `expenseRouter` |
-| Zustand stores | `use<Name>Store` | `useBoardStore` |
-| Zod schemas | `camelCase` + `Schema` suffix | `createExpenseSchema` |
+| Construct          | Convention                    | Example               |
+| ------------------ | ----------------------------- | --------------------- |
+| Files (components) | `kebab-case.tsx`              | `expense-card.tsx`    |
+| Files (utilities)  | `kebab-case.ts`               | `format-currency.ts`  |
+| React components   | `PascalCase`                  | `ExpenseCard`         |
+| Hooks              | `camelCase` with `use` prefix | `useExpenses`         |
+| Constants          | `UPPER_SNAKE_CASE`            | `MAX_BOARD_COUNT`     |
+| Database models    | `PascalCase` (Prisma)         | `Expense`, `Board`    |
+| tRPC routers       | `camelCase`                   | `expenseRouter`       |
+| Zustand stores     | `use<Name>Store`              | `useBoardStore`       |
+| Zod schemas        | `camelCase` + `Schema` suffix | `createExpenseSchema` |
 
 ### Code Quality
 
@@ -83,7 +97,7 @@
 
 ---
 
-## 3. Monetary Value Rules
+## 4. Monetary Value Rules
 
 - **All monetary values are stored as integers in paise (₹) or cents ($).** Never use floats for money.
 - Display formatting happens exclusively in the presentation layer via a shared `formatCurrency()` utility.
@@ -92,7 +106,7 @@
 
 ---
 
-## 4. Architecture Principles
+## 5. Architecture Principles
 
 ### API Layer
 
@@ -130,11 +144,12 @@
 
 ---
 
-## 5. UI / UX Principles
+## 6. UI / UX Principles
 
 ### Animations (Framer Motion — Required)
 
 Framer Motion must be used for:
+
 - Page/tab transitions (`AnimatePresence` + `motion.div`)
 - Card mount/unmount animations (fade + slide)
 - Chart data reveals (staggered entrance)
@@ -166,7 +181,7 @@ Framer Motion must be used for:
 
 ---
 
-## 6. Security
+## 7. Security
 
 - All routes except `/login` and `/signup` require authentication.
 - JWT tokens are stored in HTTP-only cookies — never in localStorage.
@@ -180,7 +195,7 @@ Framer Motion must be used for:
 
 ---
 
-## 7. Performance Constraints
+## 8. Performance Constraints
 
 - **Largest Contentful Paint (LCP):** < 2.5s on 4G connection.
 - **First Input Delay (FID):** < 100ms.
@@ -192,7 +207,7 @@ Framer Motion must be used for:
 
 ---
 
-## 8. Testing Requirements
+## 9. Testing Requirements
 
 ### Unit Tests (Vitest)
 
@@ -225,7 +240,7 @@ Framer Motion must be used for:
 
 ---
 
-## 9. AI Usage Rules
+## 10. AI Usage Rules
 
 - All AI calls go through a centralized `ai/` service module — no direct Claude API calls from components or routes.
 - AI responses are validated against a Zod schema before use.
@@ -237,7 +252,7 @@ Framer Motion must be used for:
 
 ---
 
-## 10. Git & Commit Strategy
+## 11. Git & Commit Strategy
 
 ### Commit Format
 
@@ -271,7 +286,7 @@ All commits follow **Conventional Commits**:
 
 ---
 
-## 11. Environment & Configuration
+## 12. Environment & Configuration
 
 - All environment variables documented in `.env.example`.
 - Runtime config validated at startup with Zod — app crashes fast on misconfiguration.
@@ -281,7 +296,7 @@ All commits follow **Conventional Commits**:
 
 ---
 
-## 12. Logging & Monitoring
+## 13. Logging & Monitoring
 
 - Structured JSON logs via Winston.
 - Log levels: `error`, `warn`, `info`, `debug` (debug only in development).
@@ -292,7 +307,7 @@ All commits follow **Conventional Commits**:
 
 ---
 
-## 13. Dependency Management
+## 14. Dependency Management
 
 - Pin exact versions in `package.json` (no `^` or `~`).
 - Run `npm audit` weekly — no high/critical vulnerabilities in production deps.
@@ -304,11 +319,12 @@ All commits follow **Conventional Commits**:
 ## Amendment Process
 
 This constitution can only be amended by:
+
 1. Creating a decision record (`docs/decisions/ADR-NNN.md`)
 2. Documenting the rationale for the change
 3. Updating this file with the amendment and a changelog entry
 
 ---
 
-*Last updated: 2026-03-30*
-*Version: 1.0.0*
+_Last updated: 2026-03-30_
+_Version: 1.1.0 — Added Stitch Design System & Antigravity MCP governance (Section 2)_

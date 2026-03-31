@@ -6,6 +6,25 @@
 
 ---
 
+## Design References
+
+This spec must be implemented to match the Stitch mockups exactly:
+
+| Page                    | Stitch Export                              | Route          |
+| ----------------------- | ------------------------------------------ | -------------- |
+| Login Page              | `stitch-exports/Login.html`                | `/login`       |
+| Dashboard               | `stitch-exports/Dashboard.html`            | `/dashboard`   |
+| Kanban Boards           | `stitch-exports/KanBanBoards.html`         | `/boards`      |
+| Analytics               | `stitch-exports/DetailedAnalytics.html`    | `/analytics`   |
+| Investments / Net Worth | `stitch-exports/InvestmentNetWorth.html`   | `/investments` |
+| AI Insights             | `stitch-exports/AllInsightsDashboard.html` | `/insights`    |
+
+**Design tokens and component guidelines:** `specs/main/DESIGN.md`
+
+> **Implementation Rule:** Before building any page, analyze the corresponding HTML export to understand layout, spacing, color, and component hierarchy. Then rebuild using Next.js 14, Tailwind CSS, shadcn/ui, and Framer Motion — never copy HTML/CSS from exports.
+
+---
+
 ## Table of Contents
 
 1. [Product Summary](#1-product-summary)
@@ -41,11 +60,13 @@ The application is designed for **personal use** by a financially aware individu
 ## 2. User Personas
 
 ### Primary: "The Optimizer"
+
 - **Who:** A 25–40-year-old professional managing multiple bank accounts, investments, and tax obligations.
 - **Goal:** See all financial data in one place, understand spending patterns, reduce waste, and grow net worth.
 - **Pain points:** Scattered data across bank apps, no unified view, manual spreadsheets, no AI help.
 
 ### Secondary: "The Beginner Tracker"
+
 - **Who:** Someone starting their financial tracking journey.
 - **Goal:** Simple expense logging with visual boards, without being overwhelmed.
 - **Pain points:** Traditional finance apps are too complex or too simple.
@@ -65,6 +86,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can access Finance OS.
 
 **Acceptance Criteria:**
+
 - [ ] Signup form collects: name, email, password, confirm password.
 - [ ] Email must be valid format and unique.
 - [ ] Password must be at least 8 characters with 1 uppercase, 1 number, and 1 special character.
@@ -72,8 +94,10 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] On success, user is redirected to the Dashboard.
 - [ ] On duplicate email, show: "An account with this email already exists."
 - [ ] Form shows inline validation errors as the user types (debounced).
+- [ ] UI matches the Stitch mockup `Login.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 **Edge Cases:**
+
 - Network failure during signup → show retry prompt, do not lose form data.
 - Very long name/email → enforce max length (name: 100 chars, email: 255 chars).
 
@@ -86,11 +110,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can access my financial data.
 
 **Acceptance Criteria:**
+
 - [ ] Login form collects: email, password.
 - [ ] On success, redirect to Dashboard.
 - [ ] On invalid credentials, show: "Invalid email or password." (do not reveal which is wrong).
 - [ ] After 5 failed attempts, show: "Too many attempts. Try again in 1 minute."
 - [ ] "Forgot password" link is visible (can be a placeholder/future feature).
+- [ ] UI matches the Stitch mockup `Login.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -101,11 +127,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can access Finance OS without creating a separate password.
 
 **Acceptance Criteria:**
+
 - [ ] "Sign in with Google" button on login and signup pages.
 - [ ] First-time Google sign-in creates a new account automatically.
 - [ ] Returning Google user is logged in and redirected to Dashboard.
 - [ ] If a user signed up with email and later tries Google with the same email, accounts are linked.
 - [ ] Google profile picture and name are imported on first sign-in.
+- [ ] UI matches the Stitch mockup `Login.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -116,10 +144,12 @@ The application is designed for **personal use** by a financially aware individu
 **So that** financial data is never exposed to unauthenticated users.
 
 **Acceptance Criteria:**
+
 - [ ] Accessing any app URL while logged out redirects to `/login`.
 - [ ] After login, user is redirected back to the originally requested URL.
 - [ ] Session expiry (JWT expiration) redirects to login with message: "Session expired. Please log in again."
 - [ ] Logout clears all session data and redirects to `/login`.
+- [ ] UI matches the Stitch mockup `Login.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -132,14 +162,17 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I understand my financial position immediately.
 
 **Acceptance Criteria:**
+
 - [ ] **Total Balance** card: sum of all account balances (accounts added via Boards).
 - [ ] **Monthly Spend** card: total spending in the current calendar month.
 - [ ] **Savings Rate** card: `(Income - Spending) / Income × 100`. If no income is logged, show "Set up income to calculate savings rate."
 - [ ] All monetary values formatted as currency with the appropriate symbol (₹, $, etc.).
 - [ ] Cards animate in on page load (staggered fade + slide up).
 - [ ] Each card shows a comparison indicator: ↑ or ↓ vs last month, with percentage.
+- [ ] UI matches the Stitch mockup `Dashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 **Edge Cases:**
+
 - No accounts added → show "Add your first bank account to get started" with CTA button.
 - No expenses this month → Monthly Spend shows ₹0 with "No expenses recorded this month."
 - First month of use (no previous month data) → comparison indicators show "—" instead of percentage.
@@ -153,11 +186,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can quickly spot recent trends.
 
 **Acceptance Criteria:**
+
 - [ ] Sparkline chart shows daily total spending for the last 7 days.
 - [ ] X-axis: day labels (Mon, Tue, etc.). Y-axis: implied by line height.
 - [ ] Hovering over a data point shows a tooltip with the date and amount.
 - [ ] Chart animates in with a line-drawing effect.
 - [ ] If fewer than 7 days of data, show available days with empty days as ₹0.
+- [ ] UI matches the Stitch mockup `Dashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -168,12 +203,14 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I get actionable advice without navigating to a separate tab.
 
 **Acceptance Criteria:**
+
 - [ ] Card shows a 1–3 sentence natural language summary (e.g., "You overspent on food by ₹4,200 this month. Your savings rate dropped 5% from last month.").
 - [ ] Summary refreshes monthly or when user clicks "Refresh insight."
 - [ ] While generating, card shows a pulsing skeleton with text "Analyzing your finances…"
 - [ ] If AI is unavailable, card shows: "AI insights are temporarily unavailable. Your data is safe."
 - [ ] Card has a subtle AI badge/icon indicating it's AI-generated.
 - [ ] Clicking the card navigates to the full AI Insights tab.
+- [ ] UI matches the Stitch mockup `Dashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -184,11 +221,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can log transactions without navigating away.
 
 **Acceptance Criteria:**
+
 - [ ] Two buttons: "Add Expense" and "Add Investment."
 - [ ] "Add Expense" opens a modal with the expense form (pre-selects the most recently used board).
 - [ ] "Add Investment" opens a modal with the investment form.
 - [ ] Both modals can be dismissed with Escape key or clicking outside.
 - [ ] After successful submission, a toast confirms the action and relevant Dashboard data refreshes.
+- [ ] UI matches the Stitch mockup `Dashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -203,6 +242,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can organize expenses by bank account.
 
 **Acceptance Criteria:**
+
 - [ ] User can create a new board with: name, linked bank account, month, year.
 - [ ] Board name defaults to `{Bank Name} - {Month} {Year}` (editable).
 - [ ] User can edit board name and linked account after creation.
@@ -210,8 +250,10 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Board list view shows all boards as cards (grid layout on desktop, stacked on mobile).
 - [ ] Boards are sorted by: most recent month first, then alphabetically.
 - [ ] Each board card shows: board name, account name, total spend, expense count.
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 **Edge Cases:**
+
 - No boards → show "Create your first expense board" with illustration and CTA.
 - Deleting a board with 100+ expenses → show count in confirmation dialog.
 
@@ -224,11 +266,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can link them to expense boards.
 
 **Acceptance Criteria:**
+
 - [ ] User can add an account with: name, bank name, account type (Savings, Current, Credit Card, Wallet), color, icon.
 - [ ] Account type determines icon suggestions (bank icon, credit card icon, wallet icon).
 - [ ] User can edit and delete accounts.
 - [ ] Deleting an account with linked boards shows warning: "This account is linked to {N} boards. Delete anyway?"
 - [ ] Account list is accessible from board creation and from a settings/accounts page.
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -239,6 +283,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can track the status of each expense.
 
 **Acceptance Criteria:**
+
 - [ ] Each board opens to a Kanban view with exactly three columns:
   - **Planned**: expenses you expect to make this month.
   - **Spent**: expenses that have been paid/completed.
@@ -246,6 +291,7 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Each column shows its total amount at the top.
 - [ ] Columns are visually distinct (subtle color coding or header styling).
 - [ ] On mobile, columns are horizontally scrollable or tabbed.
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -256,6 +302,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I have a comprehensive record of every transaction.
 
 **Acceptance Criteria:**
+
 - [ ] Expense card fields:
   - **Title** (required, max 100 chars)
   - **Amount** (required, positive number, entered in rupees — stored in paise)
@@ -270,8 +317,10 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Clicking a card opens a detail/edit modal.
 - [ ] Card has a quick delete action (with confirmation).
 - [ ] Cards animate in when added (fade + slide from top).
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 **Edge Cases:**
+
 - Amount of ₹0 → reject with "Amount must be greater than zero."
 - Very long title → truncate in card view, show full in modal.
 - Tax rate of 0% with tax type selected → show warning "Tax rate is 0%. Did you mean to select no tax?"
@@ -286,12 +335,14 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can update their status visually.
 
 **Acceptance Criteria:**
+
 - [ ] Cards can be dragged from any column to any other column.
 - [ ] Drag interaction shows a ghost card following the cursor.
 - [ ] Drop zone highlights when a card is dragged over it.
 - [ ] On drop, the card's status updates immediately (optimistic update).
 - [ ] Drag and drop works on desktop (mouse) and is disabled on mobile (use a "Move to" action instead).
 - [ ] Card order within a column is persisted.
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -302,6 +353,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can find specific transactions quickly.
 
 **Acceptance Criteria:**
+
 - [ ] Filter bar at the top of each board with options:
   - **Category** (multi-select dropdown)
   - **Date range** (start date – end date picker)
@@ -312,6 +364,7 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] "Clear all filters" button visible when any filter is active.
 - [ ] Filtered-out cards are hidden (not grayed out).
 - [ ] Column totals update to reflect filtered results.
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -322,6 +375,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I understand spending patterns per account.
 
 **Acceptance Criteria:**
+
 - [ ] Board analytics panel (collapsible sidebar or bottom drawer):
   - **Category pie chart**: spending distribution by category on this board.
   - **Spend trend**: bar chart showing daily spending over the board's month.
@@ -329,6 +383,7 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Analytics update in real-time as expenses are added/modified.
 - [ ] Charts animate in (staggered reveal).
 - [ ] On mobile, analytics are accessible via a "View Analytics" button (opens full-screen overlay).
+- [ ] UI matches the Stitch mockup `KanBanBoards.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -341,11 +396,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can identify trends.
 
 **Acceptance Criteria:**
+
 - [ ] Grouped bar chart showing total spend per month (current + last 3 months).
 - [ ] Each bar is labeled with the month name and total amount.
 - [ ] Color coding: current month in primary color, historical months in muted tones.
 - [ ] Tooltip on hover shows exact amounts.
 - [ ] If user has fewer than 4 months of data, show available months only.
+- [ ] UI matches the Stitch mockup `DetailedAnalytics.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -356,11 +413,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I know where my money goes.
 
 **Acceptance Criteria:**
+
 - [ ] Donut chart showing percentage of total spend per category.
 - [ ] Categories include: Food, Transport, Subscriptions, EMI, Shopping, Bills, Health, Entertainment, Education, Other (user-customizable).
 - [ ] Legend shows category name, amount, and percentage.
 - [ ] Clicking a category segment filters the view to show matching expenses below the chart.
 - [ ] Chart animates in with a radial reveal.
+- [ ] UI matches the Stitch mockup `DetailedAnalytics.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -371,6 +430,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can track my tax burden.
 
 **Acceptance Criteria:**
+
 - [ ] Summary cards showing:
   - **Total GST paid** this month
   - **Total TDS deducted** this month
@@ -378,6 +438,7 @@ The application is designed for **personal use** by a financially aware individu
   - **Grand total tax** this month
 - [ ] Below the summary: table listing all tax-bearing expenses with: title, amount, tax type, tax rate, tax amount.
 - [ ] Sortable by any column.
+- [ ] UI matches the Stitch mockup `DetailedAnalytics.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -388,10 +449,12 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can catch mistakes or unusual spending.
 
 **Acceptance Criteria:**
+
 - [ ] An expense is flagged as anomalous if its amount is **≥ 2× the category average** for the last 3 months.
 - [ ] Anomalous expenses are highlighted with a warning badge in the analytics view.
 - [ ] A dedicated "Anomalies" section lists all flagged expenses with: title, amount, category average, deviation multiplier.
 - [ ] If no anomalies, show: "No spending anomalies detected this month. 👍"
+- [ ] UI matches the Stitch mockup `DetailedAnalytics.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -402,12 +465,14 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can use it in spreadsheets or share with my CA.
 
 **Acceptance Criteria:**
+
 - [ ] Export button with two options: **CSV** and **PDF**.
 - [ ] Export scope selection: current month, custom date range, specific board, all data.
 - [ ] CSV includes: date, title, amount, category, tax type, tax rate, tax amount, board name, status.
 - [ ] PDF includes the same data in a formatted table with headers and totals.
 - [ ] Export starts a download immediately — no email required.
 - [ ] Large exports (>1000 rows) show a progress indicator.
+- [ ] UI matches the Stitch mockup `DetailedAnalytics.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -420,6 +485,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can track my complete portfolio.
 
 **Acceptance Criteria:**
+
 - [ ] Investment form fields:
   - **Asset type** (required): Stocks, Mutual Funds, Crypto, FD, PPF, Gold, Real Estate
   - **Asset name** (required, max 100 chars)
@@ -431,6 +497,7 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Delete requires confirmation.
 
 **Edge Cases:**
+
 - Current value less than invested amount → show as loss (red text).
 - Current value of ₹0 → allow (for written-off investments).
 - Very old investment dates → allow (no restriction on past dates).
@@ -444,6 +511,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I understand my investment distribution.
 
 **Acceptance Criteria:**
+
 - [ ] Summary cards:
   - **Total Invested**: sum of all invested amounts.
   - **Current Value**: sum of all current values.
@@ -452,6 +520,7 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Investment list below chart showing each investment with gain/loss.
 - [ ] Gain shown in green, loss in red, neutral in gray.
 - [ ] List sortable by: name, type, invested amount, current value, gain/loss, date.
+- [ ] UI matches the Stitch mockup `InvestmentNetWorth.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -462,11 +531,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can visualize my financial growth.
 
 **Acceptance Criteria:**
+
 - [ ] Line chart showing net worth (total account balances + investment current values) plotted monthly.
 - [ ] X-axis: months. Y-axis: net worth amount.
 - [ ] Data points are clickable — show breakdown (accounts: ₹X, investments: ₹Y).
 - [ ] Chart shows all available months (since account creation).
 - [ ] If only one month of data, show a single point with message: "Keep tracking to see your trend."
+- [ ] UI matches the Stitch mockup `InvestmentNetWorth.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -477,11 +548,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** my portfolio reflects real market conditions.
 
 **Acceptance Criteria:**
+
 - [ ] Each investment has an "Update Value" action.
 - [ ] Quick-update inline edit for current value (no modal needed).
 - [ ] "Last updated" timestamp shown on each investment.
 - [ ] Bulk update: user can update all investments of a type at once.
 - [ ] (Future enhancement placeholder): API-based auto-update for stocks and mutual funds.
+- [ ] UI matches the Stitch mockup `InvestmentNetWorth.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -494,6 +567,7 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I get a holistic view without manual analysis.
 
 **Acceptance Criteria:**
+
 - [ ] Summary is generated once per month (on first visit or on demand).
 - [ ] Summary is in plain English, 3–5 paragraphs covering:
   - Overall spending vs income
@@ -504,6 +578,7 @@ The application is designed for **personal use** by a financially aware individu
 - [ ] Summary is displayed in a readable card with proper formatting (bold, bullet points).
 - [ ] "Regenerate" button available (rate-limited to once per hour).
 - [ ] Generation shows animated loading state with estimated wait time.
+- [ ] UI matches the Stitch mockup `AllInsightsDashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -514,11 +589,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can save more money.
 
 **Acceptance Criteria:**
+
 - [ ] Suggestions are specific and actionable (e.g., "Cancel 3 subscriptions: Netflix, Spotify, YouTube Premium = ₹2,400/month saved").
 - [ ] Each suggestion shows: description, estimated monthly savings, difficulty (Easy, Medium, Hard).
 - [ ] User can dismiss suggestions they don't want to see again.
 - [ ] Suggestions are based on the user's actual spending data — not generic advice.
 - [ ] Minimum 3 suggestions per month (if data is sufficient).
+- [ ] UI matches the Stitch mockup `AllInsightsDashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -529,10 +606,12 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can optimize my wealth growth.
 
 **Acceptance Criteria:**
+
 - [ ] Suggestions based on: current savings rate, portfolio allocation, investment types.
 - [ ] Examples: "Your savings rate of 35% is excellent. Consider increasing SIP in equity mutual funds by ₹5,000/month."
 - [ ] Disclaimer shown: "AI suggestions are not financial advice. Consult a certified advisor."
 - [ ] Suggestions refresh monthly.
+- [ ] UI matches the Stitch mockup `AllInsightsDashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -543,11 +622,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** categorization is faster and more consistent.
 
 **Acceptance Criteria:**
+
 - [ ] When user types an expense title, AI suggests a category (after 3+ characters).
 - [ ] Suggestion appears as a subtle hint below the category dropdown.
 - [ ] User can accept (one click) or ignore the suggestion.
 - [ ] Categorization improves over time based on user's history.
 - [ ] If AI is unavailable, category field works normally without suggestions.
+- [ ] UI matches the Stitch mockup `AllInsightsDashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -558,9 +639,11 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I understand unusual patterns without reading charts.
 
 **Acceptance Criteria:**
+
 - [ ] When anomalies are detected (see US-ANALYTICS-04), AI generates a natural language explanation.
 - [ ] Example: "Your dining expenses this month (₹12,400) are 2.3× higher than your 3-month average (₹5,400). This was mainly driven by 3 restaurant visits over ₹2,000 each."
 - [ ] Alerts appear in the AI Insights tab and as notification cards.
+- [ ] UI matches the Stitch mockup `AllInsightsDashboard.html` in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -573,11 +656,13 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I can adjust my spending.
 
 **Acceptance Criteria:**
+
 - [ ] User can set a monthly budget limit per category (in Category settings).
 - [ ] When spending in a category reaches 80% of the limit → warning notification.
 - [ ] When spending exceeds 100% → alert notification.
 - [ ] Notifications appear in an in-app notification center (bell icon in header).
 - [ ] Notification shows: category name, amount spent, budget limit, overage amount.
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -588,10 +673,12 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I don't miss payments.
 
 **Acceptance Criteria:**
+
 - [ ] Recurring expenses (in the Recurring column) have an optional "due date" field.
 - [ ] Reminder generated 3 days before the due date and on the due date.
 - [ ] Notification shows: expense title, amount, due date, board name.
 - [ ] User can mark a reminder as "Paid" (moves the expense to the Spent column for that month).
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -602,10 +689,12 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I stay informed even without opening the app daily.
 
 **Acceptance Criteria:**
+
 - [ ] Generated on the 1st of each month for the previous month.
 - [ ] In-app notification with: total spent, top category, savings rate, investment change.
 - [ ] (Optional future enhancement): email delivery of the same summary.
 - [ ] User can opt out of monthly summary notifications in settings.
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -616,12 +705,14 @@ The application is designed for **personal use** by a financially aware individu
 **So that** I don't miss important financial alerts.
 
 **Acceptance Criteria:**
+
 - [ ] Bell icon in the app header with unread count badge.
 - [ ] Clicking opens a dropdown/sidebar with notification list.
 - [ ] Each notification shows: icon, message, timestamp, read/unread indicator.
 - [ ] "Mark all as read" action.
 - [ ] Notifications persist for 30 days, then auto-archived.
 - [ ] Clicking a notification navigates to the relevant context (board, analytics, etc.).
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -630,29 +721,35 @@ The application is designed for **personal use** by a financially aware individu
 #### US-SETTINGS-01: Profile Management
 
 **Acceptance Criteria:**
+
 - [ ] User can update: name, profile picture.
 - [ ] Email is displayed but not editable (to prevent account confusion).
 - [ ] Password change requires current password + new password + confirmation.
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
 #### US-SETTINGS-02: Category Management
 
 **Acceptance Criteria:**
+
 - [ ] User can create custom categories with: name, color, icon, monthly budget limit.
 - [ ] Default categories are pre-seeded on account creation: Food, Transport, Subscriptions, EMI, Shopping, Bills, Health, Entertainment, Education, Rent, Salary, Other.
 - [ ] User can edit and delete custom categories.
 - [ ] Default categories can be edited but not deleted.
 - [ ] Deleting a category with existing expenses shows: "Reassign {N} expenses to another category or mark as 'Other'."
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
 #### US-SETTINGS-03: Currency & Locale
 
 **Acceptance Criteria:**
+
 - [ ] User can select their primary currency: INR (₹), USD ($), EUR (€), GBP (£).
 - [ ] Currency symbol and formatting apply globally.
 - [ ] Default: INR.
+- [ ] UI matches the Stitch design system in layout, spacing, color, and component hierarchy. Verified against `DESIGN.md` tokens.
 
 ---
 
@@ -661,6 +758,7 @@ The application is designed for **personal use** by a financially aware individu
 ### 4.1 Loading States
 
 Every data-dependent section must show a loading state:
+
 - Dashboard cards → skeleton cards (same dimensions, pulsing gray).
 - Charts → skeleton chart placeholder.
 - Lists → skeleton rows.
@@ -669,6 +767,7 @@ Every data-dependent section must show a loading state:
 ### 4.2 Empty States
 
 Every list/collection must handle the empty case:
+
 - No boards → illustration + "Create your first board" CTA.
 - No expenses on a board → "Add your first expense" CTA in each column.
 - No investments → illustration + "Track your first investment" CTA.
@@ -678,6 +777,7 @@ Every list/collection must handle the empty case:
 ### 4.3 Error States
 
 Every data-fetching operation must handle errors:
+
 - Network error → "Something went wrong. Check your connection and try again." with retry button.
 - Server error (5xx) → "We're having trouble. Please try again in a moment." with retry button.
 - Auth error (401) → redirect to login.
@@ -687,6 +787,7 @@ Every data-fetching operation must handle errors:
 ### 4.4 Confirmation Dialogs
 
 Destructive actions require explicit confirmation:
+
 - Delete board, expense, investment, account, category.
 - Dialogs use consistent format: title, description with context, "Cancel" and "Delete" (red) buttons.
 - Double-confirmation for irreversible bulk actions.
@@ -694,6 +795,7 @@ Destructive actions require explicit confirmation:
 ### 4.5 Toast Notifications
 
 After successful mutations, show a toast:
+
 - "Expense added" / "Investment updated" / "Board deleted"
 - Toasts auto-dismiss after 4 seconds.
 - Toasts have an "Undo" action where applicable (expense add, expense move).
@@ -701,12 +803,12 @@ After successful mutations, show a toast:
 
 ### 4.6 Keyboard Shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl/Cmd + K` | Open command palette / quick search |
-| `Ctrl/Cmd + N` | Add new expense (on Boards tab) |
+| Shortcut               | Action                                  |
+| ---------------------- | --------------------------------------- |
+| `Ctrl/Cmd + K`         | Open command palette / quick search     |
+| `Ctrl/Cmd + N`         | Add new expense (on Boards tab)         |
 | `Ctrl/Cmd + Shift + N` | Add new investment (on Investments tab) |
-| `Escape` | Close any modal/dialog |
+| `Escape`               | Close any modal/dialog                  |
 
 ### 4.7 Navigation
 
@@ -722,44 +824,47 @@ After successful mutations, show a toast:
 
 To maintain scope clarity, the following are explicitly **out of scope** for v1:
 
-| Feature | Reason |
-|---|---|
-| **Multi-user / Family sharing** | Single-user app by design. |
-| **Bank API integration (Plaid, Yodlee)** | Manual entry only in v1; API integration is a future enhancement. |
-| **Mobile native app** | Web-only; responsive design covers mobile use. |
-| **Automated transaction import** | No CSV import, bank sync, or SMS parsing in v1. |
-| **Budgeting forecasts** | AI provides suggestions, not forward-looking budget plans. |
-| **Cryptocurrency real-time prices** | Manual entry for crypto; API integration is a future enhancement. |
-| **Multi-currency support** | Single primary currency per user in v1. |
-| **Receipt scanning / OCR** | No image upload or OCR in v1. |
-| **Social features** | No sharing, leaderboards, or community features. |
-| **Recurring payment auto-creation** | Recurring column is manual; auto-generation of next month's entries is a future enhancement. |
-| **Tax filing assistance** | We track tax paid; we do not generate tax returns or ITR data. |
-| **Email notifications** | In-app only for v1; email delivery is a future enhancement. |
-| **Dark mode** | Light mode only for v1; dark mode is a fast-follow. |
-| **Internationalization (i18n)** | English only for v1. |
-| **Offline support / PWA** | Online-only for v1. |
+| Feature                                  | Reason                                                                                                                                          |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Multi-user / Family sharing**          | Single-user app by design.                                                                                                                      |
+| **Bank API integration (Plaid, Yodlee)** | Manual entry only in v1; API integration is a future enhancement.                                                                               |
+| **Mobile native app**                    | Web-only; responsive design covers mobile use.                                                                                                  |
+| **Automated transaction import**         | No CSV import, bank sync, or SMS parsing in v1.                                                                                                 |
+| **Budgeting forecasts**                  | AI provides suggestions, not forward-looking budget plans.                                                                                      |
+| **Cryptocurrency real-time prices**      | Manual entry for crypto; API integration is a future enhancement.                                                                               |
+| **Multi-currency support**               | Single primary currency per user in v1.                                                                                                         |
+| **Receipt scanning / OCR**               | No image upload or OCR in v1.                                                                                                                   |
+| **Social features**                      | No sharing, leaderboards, or community features.                                                                                                |
+| **Recurring payment auto-creation**      | Recurring column is manual; auto-generation of next month's entries is a future enhancement.                                                    |
+| **Tax filing assistance**                | We track tax paid; we do not generate tax returns or ITR data.                                                                                  |
+| **Email notifications**                  | In-app only for v1; email delivery is a future enhancement.                                                                                     |
+| **Dark mode**                            | Light mode only for v1; dark mode is a fast-follow.                                                                                             |
+| **Internationalization (i18n)**          | English only for v1.                                                                                                                            |
+| **Offline support / PWA**                | Online-only for v1.                                                                                                                             |
+| **Direct use of Stitch HTML/CSS**        | We are NOT using exported HTML/CSS directly. All UI must be rebuilt with Next.js, Tailwind, and shadcn/ui.                                      |
+| **Deviations from Stitch design system** | We are NOT deviating from the Stitch design system without explicit approval. All visual decisions come from `DESIGN.md` and `stitch-exports/`. |
+| **Custom components over shadcn/ui**     | We are NOT creating custom components when shadcn/ui equivalents exist. shadcn/ui is always preferred.                                          |
 
 ---
 
 ## Appendix: Category Defaults
 
-| Category | Icon | Default Color | Budget Example |
-|---|---|---|---|
-| Food & Dining | 🍕 | Orange | ₹8,000 |
-| Transport | 🚗 | Blue | ₹3,000 |
-| Subscriptions | 📱 | Purple | ₹2,000 |
-| EMI | 🏦 | Dark Blue | ₹15,000 |
-| Shopping | 🛍️ | Pink | ₹5,000 |
-| Bills & Utilities | ⚡ | Yellow | ₹4,000 |
-| Health | 🏥 | Red | ₹2,000 |
-| Entertainment | 🎬 | Teal | ₹3,000 |
-| Education | 📚 | Green | ₹2,000 |
-| Rent | 🏠 | Brown | ₹20,000 |
-| Salary / Income | 💰 | Gold | — |
-| Other | 📦 | Gray | ₹5,000 |
+| Category          | Icon | Default Color | Budget Example |
+| ----------------- | ---- | ------------- | -------------- |
+| Food & Dining     | 🍕   | Orange        | ₹8,000         |
+| Transport         | 🚗   | Blue          | ₹3,000         |
+| Subscriptions     | 📱   | Purple        | ₹2,000         |
+| EMI               | 🏦   | Dark Blue     | ₹15,000        |
+| Shopping          | 🛍️   | Pink          | ₹5,000         |
+| Bills & Utilities | ⚡   | Yellow        | ₹4,000         |
+| Health            | 🏥   | Red           | ₹2,000         |
+| Entertainment     | 🎬   | Teal          | ₹3,000         |
+| Education         | 📚   | Green         | ₹2,000         |
+| Rent              | 🏠   | Brown         | ₹20,000        |
+| Salary / Income   | 💰   | Gold          | —              |
+| Other             | 📦   | Gray          | ₹5,000         |
 
 ---
 
-*Last updated: 2026-03-30*
-*Version: 1.0.0*
+_Last updated: 2026-03-30_
+_Version: 1.1.0 — Added Stitch design references, mockup acceptance criteria, and design system scope exclusions_

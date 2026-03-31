@@ -35,9 +35,17 @@ finance-os/
 │   └── memory/
 │       └── constitution.md
 ├── specs/
-│   └── 001-finance-os-core/
+│   └── main/
+│       ├── DESIGN.md                     # Stitch design tokens, color system, typography, layout rules
 │       ├── spec.md
 │       └── plan.md
+├── stitch-exports/                       # HTML visual mockups (REFERENCE ONLY — never copy HTML/CSS)
+│   ├── Login.html
+│   ├── Dashboard.html
+│   ├── KanBanBoards.html
+│   ├── DetailedAnalytics.html
+│   ├── InvestmentNetWorth.html
+│   └── AllInsightsDashboard.html
 ├── prisma/
 │   ├── schema.prisma
 │   ├── seed.ts
@@ -231,6 +239,29 @@ finance-os/
 ├── package.json
 └── README.md
 ```
+
+---
+
+### UI Implementation Strategy (Stitch-Driven)
+
+All page implementations are driven by the Stitch HTML exports. The workflow for every page is:
+
+1. **Analyze** the corresponding HTML export to understand structure, spacing, color, and hierarchy
+2. **Map** each HTML element to the appropriate shadcn/ui component or custom Tailwind component
+3. **Apply** design tokens from `specs/main/DESIGN.md` via `tailwind.config.ts`
+4. **Animate** using Framer Motion to replicate micro-interactions from the Stitch designs
+5. **Validate** via Stitch MCP (`stitch://`) queries to confirm props, spacing, and token accuracy
+
+| Stitch Export               | Next.js Route  | Primary Components            | Notes                                    |
+| --------------------------- | -------------- | ----------------------------- | ---------------------------------------- |
+| `Login.html`                | `/login`       | Card, Input, Button (shadcn)  | Match exact spacing from mockup          |
+| `Dashboard.html`            | `/dashboard`   | Card, Chart, Badge            | Sparkline must match Stitch design       |
+| `KanBanBoards.html`         | `/boards`      | DragDropContext, Card, Dialog | Kanban columns = Planned/Spent/Recurring |
+| `DetailedAnalytics.html`    | `/analytics`   | DonutChart, BarChart, Tabs    | Use Framer Motion for chart reveals      |
+| `InvestmentNetWorth.html`   | `/investments` | Table, DonutChart, Form       | Allocation chart matches Stitch          |
+| `AllInsightsDashboard.html` | `/insights`    | Card, Alert, Skeleton         | AI summary card styling critical         |
+
+> **Skeleton Loaders:** All dashboard data must use skeleton loaders that match the Stitch card layouts. Never show blank states — always show a structured skeleton that mirrors the final component dimensions.
 
 ---
 
@@ -638,18 +669,18 @@ model NetWorthSnapshot {
 // Seeds default categories for a new user
 
 const DEFAULT_CATEGORIES = [
-  { name: "Food & Dining",    color: "#f97316", icon: "utensils",      budgetLimit: 800000 },
-  { name: "Transport",        color: "#3b82f6", icon: "car",           budgetLimit: 300000 },
-  { name: "Subscriptions",    color: "#8b5cf6", icon: "smartphone",    budgetLimit: 200000 },
-  { name: "EMI",              color: "#1e40af", icon: "landmark",      budgetLimit: 1500000 },
-  { name: "Shopping",         color: "#ec4899", icon: "shopping-bag",  budgetLimit: 500000 },
-  { name: "Bills & Utilities",color: "#eab308", icon: "zap",           budgetLimit: 400000 },
-  { name: "Health",           color: "#ef4444", icon: "heart-pulse",   budgetLimit: 200000 },
-  { name: "Entertainment",    color: "#14b8a6", icon: "clapperboard",  budgetLimit: 300000 },
-  { name: "Education",        color: "#22c55e", icon: "book-open",     budgetLimit: 200000 },
-  { name: "Rent",             color: "#92400e", icon: "home",          budgetLimit: 2000000 },
-  { name: "Salary / Income",  color: "#ca8a04", icon: "wallet",        budgetLimit: null },
-  { name: "Other",            color: "#6b7280", icon: "package",       budgetLimit: 500000 },
+  { name: "Food & Dining", color: "#f97316", icon: "utensils", budgetLimit: 800000 },
+  { name: "Transport", color: "#3b82f6", icon: "car", budgetLimit: 300000 },
+  { name: "Subscriptions", color: "#8b5cf6", icon: "smartphone", budgetLimit: 200000 },
+  { name: "EMI", color: "#1e40af", icon: "landmark", budgetLimit: 1500000 },
+  { name: "Shopping", color: "#ec4899", icon: "shopping-bag", budgetLimit: 500000 },
+  { name: "Bills & Utilities", color: "#eab308", icon: "zap", budgetLimit: 400000 },
+  { name: "Health", color: "#ef4444", icon: "heart-pulse", budgetLimit: 200000 },
+  { name: "Entertainment", color: "#14b8a6", icon: "clapperboard", budgetLimit: 300000 },
+  { name: "Education", color: "#22c55e", icon: "book-open", budgetLimit: 200000 },
+  { name: "Rent", color: "#92400e", icon: "home", budgetLimit: 2000000 },
+  { name: "Salary / Income", color: "#ca8a04", icon: "wallet", budgetLimit: null },
+  { name: "Other", color: "#6b7280", icon: "package", budgetLimit: 500000 },
 ];
 // budgetLimit values are in paise (e.g., 800000 paise = ₹8,000)
 ```
@@ -743,8 +774,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -798,44 +828,44 @@ const createExpenseSchema = z.object({
 });
 
 export const expenseRouter = createRouter({
-  create: protectedProcedure
-    .input(createExpenseSchema)
-    .mutation(async ({ ctx, input }) => {
-      // Calculate tax amount
-      const taxAmount = Math.round((input.amount * input.taxRate) / 100);
+  create: protectedProcedure.input(createExpenseSchema).mutation(async ({ ctx, input }) => {
+    // Calculate tax amount
+    const taxAmount = Math.round((input.amount * input.taxRate) / 100);
 
-      // Verify board belongs to user
-      const board = await ctx.db.board.findFirst({
-        where: { id: input.boardId, userId: ctx.userId },
-      });
-      if (!board) throw new TRPCError({ code: "NOT_FOUND" });
+    // Verify board belongs to user
+    const board = await ctx.db.board.findFirst({
+      where: { id: input.boardId, userId: ctx.userId },
+    });
+    if (!board) throw new TRPCError({ code: "NOT_FOUND" });
 
-      const expense = await ctx.db.expense.create({
-        data: {
-          ...input,
-          taxAmount,
-        },
-        include: { category: true },
-      });
+    const expense = await ctx.db.expense.create({
+      data: {
+        ...input,
+        taxAmount,
+      },
+      include: { category: true },
+    });
 
-      // Dispatch async jobs
-      await analyticsQueue.add("recalculate", {
-        userId: ctx.userId,
-        boardId: input.boardId,
-      });
+    // Dispatch async jobs
+    await analyticsQueue.add("recalculate", {
+      userId: ctx.userId,
+      boardId: input.boardId,
+    });
 
-      // Invalidate caches
-      await invalidateExpenseCache(ctx.userId, input.boardId);
+    // Invalidate caches
+    await invalidateExpenseCache(ctx.userId, input.boardId);
 
-      return expense;
-    }),
+    return expense;
+  }),
 
   updateStatus: protectedProcedure
-    .input(z.object({
-      id: z.string().cuid(),
-      status: z.nativeEnum(ExpenseStatus),
-      sortOrder: z.number().int().optional(),
-    }))
+    .input(
+      z.object({
+        id: z.string().cuid(),
+        status: z.nativeEnum(ExpenseStatus),
+        sortOrder: z.number().int().optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const expense = await ctx.db.expense.findFirst({
         where: { id: input.id, board: { userId: ctx.userId } },
@@ -864,52 +894,42 @@ export const expenseRouter = createRouter({
 // src/server/cache/keys.ts
 
 export const cacheKeys = {
-  dashboard: (userId: string) =>
-    `finance-os:${userId}:dashboard`,
+  dashboard: (userId: string) => `finance-os:${userId}:dashboard`,
 
-  sparkline: (userId: string) =>
-    `finance-os:${userId}:sparkline`,
+  sparkline: (userId: string) => `finance-os:${userId}:sparkline`,
 
-  monthlyComparison: (userId: string, year: number, month: number) =>
-    `finance-os:${userId}:monthly-comparison:${year}-${month}`,
+  monthlyComparison: (userId: string, year: number, month: number) => `finance-os:${userId}:monthly-comparison:${year}-${month}`,
 
-  categoryBreakdown: (userId: string, year: number, month: number) =>
-    `finance-os:${userId}:category-breakdown:${year}-${month}`,
+  categoryBreakdown: (userId: string, year: number, month: number) => `finance-os:${userId}:category-breakdown:${year}-${month}`,
 
-  taxSummary: (userId: string, year: number, month: number) =>
-    `finance-os:${userId}:tax-summary:${year}-${month}`,
+  taxSummary: (userId: string, year: number, month: number) => `finance-os:${userId}:tax-summary:${year}-${month}`,
 
-  anomalies: (userId: string, year: number, month: number) =>
-    `finance-os:${userId}:anomalies:${year}-${month}`,
+  anomalies: (userId: string, year: number, month: number) => `finance-os:${userId}:anomalies:${year}-${month}`,
 
-  boardAnalytics: (boardId: string) =>
-    `finance-os:board:${boardId}:analytics`,
+  boardAnalytics: (boardId: string) => `finance-os:board:${boardId}:analytics`,
 
-  portfolio: (userId: string) =>
-    `finance-os:${userId}:portfolio`,
+  portfolio: (userId: string) => `finance-os:${userId}:portfolio`,
 
-  netWorthHistory: (userId: string) =>
-    `finance-os:${userId}:net-worth-history`,
+  netWorthHistory: (userId: string) => `finance-os:${userId}:net-worth-history`,
 
-  aiInsight: (userId: string, year: number, month: number) =>
-    `finance-os:${userId}:ai-insight:${year}-${month}`,
+  aiInsight: (userId: string, year: number, month: number) => `finance-os:${userId}:ai-insight:${year}-${month}`,
 } as const;
 ```
 
 ### TTL Configuration
 
-| Cache Key Pattern | TTL | Invalidation Trigger |
-|---|---|---|
-| `dashboard` | 5 minutes | Any expense/account mutation |
-| `sparkline` | 5 minutes | Any expense mutation |
-| `monthly-comparison` | 5 minutes | Any expense mutation |
-| `category-breakdown` | 5 minutes | Any expense mutation |
-| `tax-summary` | 5 minutes | Any expense mutation |
-| `anomalies` | 5 minutes | Any expense mutation |
-| `board:*:analytics` | 5 minutes | Expense mutation on that board |
-| `portfolio` | 5 minutes | Any investment mutation |
-| `net-worth-history` | 5 minutes | Any investment/account mutation |
-| `ai-insight` | 1 hour | Manual regeneration only |
+| Cache Key Pattern    | TTL       | Invalidation Trigger            |
+| -------------------- | --------- | ------------------------------- |
+| `dashboard`          | 5 minutes | Any expense/account mutation    |
+| `sparkline`          | 5 minutes | Any expense mutation            |
+| `monthly-comparison` | 5 minutes | Any expense mutation            |
+| `category-breakdown` | 5 minutes | Any expense mutation            |
+| `tax-summary`        | 5 minutes | Any expense mutation            |
+| `anomalies`          | 5 minutes | Any expense mutation            |
+| `board:*:analytics`  | 5 minutes | Expense mutation on that board  |
+| `portfolio`          | 5 minutes | Any investment mutation         |
+| `net-worth-history`  | 5 minutes | Any investment/account mutation |
+| `ai-insight`         | 1 hour    | Manual regeneration only        |
 
 ### Cache Invalidation Helper
 
@@ -919,33 +939,16 @@ export const cacheKeys = {
 import { redis } from "./redis";
 import { cacheKeys } from "./keys";
 
-export async function invalidateExpenseCache(
-  userId: string,
-  boardId: string
-): Promise<void> {
+export async function invalidateExpenseCache(userId: string, boardId: string): Promise<void> {
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  await Promise.all([
-    redis.del(cacheKeys.dashboard(userId)),
-    redis.del(cacheKeys.sparkline(userId)),
-    redis.del(cacheKeys.monthlyComparison(userId, year, month)),
-    redis.del(cacheKeys.categoryBreakdown(userId, year, month)),
-    redis.del(cacheKeys.taxSummary(userId, year, month)),
-    redis.del(cacheKeys.anomalies(userId, year, month)),
-    redis.del(cacheKeys.boardAnalytics(boardId)),
-  ]);
+  await Promise.all([redis.del(cacheKeys.dashboard(userId)), redis.del(cacheKeys.sparkline(userId)), redis.del(cacheKeys.monthlyComparison(userId, year, month)), redis.del(cacheKeys.categoryBreakdown(userId, year, month)), redis.del(cacheKeys.taxSummary(userId, year, month)), redis.del(cacheKeys.anomalies(userId, year, month)), redis.del(cacheKeys.boardAnalytics(boardId))]);
 }
 
-export async function invalidateInvestmentCache(
-  userId: string
-): Promise<void> {
-  await Promise.all([
-    redis.del(cacheKeys.portfolio(userId)),
-    redis.del(cacheKeys.netWorthHistory(userId)),
-    redis.del(cacheKeys.dashboard(userId)),
-  ]);
+export async function invalidateInvestmentCache(userId: string): Promise<void> {
+  await Promise.all([redis.del(cacheKeys.portfolio(userId)), redis.del(cacheKeys.netWorthHistory(userId)), redis.del(cacheKeys.dashboard(userId))]);
 }
 ```
 
@@ -1162,24 +1165,25 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Fully configured project shell with CI pipeline.
 
-| Task | Details |
-|---|---|
-| 0.1 | Initialize Next.js 14 project with App Router, TypeScript strict, Tailwind |
-| 0.2 | Install and configure all dependencies (exact versions from manifest) |
-| 0.3 | Set up Prisma with PostgreSQL (Neon); run initial migration |
-| 0.4 | Configure shadcn/ui; install all required components |
-| 0.5 | Set up tRPC boilerplate (init, context, appRouter, HTTP handler) |
-| 0.6 | Configure Upstash Redis client |
-| 0.7 | Configure BullMQ queues and worker scaffold |
-| 0.8 | Set up Sentry + Winston logging |
-| 0.9 | Configure Vitest + Playwright |
-| 0.10 | Create `docker-compose.yml` for local Postgres + Redis |
-| 0.11 | Create `.env.example` with all required variables |
-| 0.12 | Set up ESLint + Prettier with project rules |
-| 0.13 | Create root layout with providers (TRPCProvider, QueryClient, ThemeProvider) |
-| 0.14 | Create shared components: ErrorBoundary, PageTransition, EmptyState, SkeletonCard |
+| Task | Details                                                                                                                                                                                                                                                    |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.1  | **Stitch Design Integration**: Audit all files in `/stitch-exports/`, extract design tokens from `specs/main/DESIGN.md` into `tailwind.config.ts`, create component mapping (HTML element → shadcn/ui component), set up Stitch MCP queries for validation |
+| 0.2  | Initialize Next.js 14 project with App Router, TypeScript strict, Tailwind                                                                                                                                                                                 |
+| 0.3  | Install and configure all dependencies (exact versions from manifest)                                                                                                                                                                                      |
+| 0.4  | Set up Prisma with PostgreSQL (Neon); run initial migration                                                                                                                                                                                                |
+| 0.5  | Configure shadcn/ui; install all required components                                                                                                                                                                                                       |
+| 0.6  | Set up tRPC boilerplate (init, context, appRouter, HTTP handler)                                                                                                                                                                                           |
+| 0.7  | Configure Upstash Redis client                                                                                                                                                                                                                             |
+| 0.8  | Configure BullMQ queues and worker scaffold                                                                                                                                                                                                                |
+| 0.9  | Set up Sentry + Winston logging                                                                                                                                                                                                                            |
+| 0.10 | Configure Vitest + Playwright                                                                                                                                                                                                                              |
+| 0.11 | Create `docker-compose.yml` for local Postgres + Redis                                                                                                                                                                                                     |
+| 0.12 | Create `.env.example` with all required variables                                                                                                                                                                                                          |
+| 0.13 | Set up ESLint + Prettier with project rules                                                                                                                                                                                                                |
+| 0.14 | Create root layout with providers (TRPCProvider, QueryClient, ThemeProvider)                                                                                                                                                                               |
+| 0.15 | Create shared components: ErrorBoundary, PageTransition, EmptyState, SkeletonCard (skeleton dimensions must match Stitch card layouts)                                                                                                                     |
 
-**Acceptance:** `npm run dev` starts cleanly. `npm run build` succeeds. Tests run (empty suite passes).
+**Acceptance:** `npm run dev` starts cleanly. `npm run build` succeeds. Tests run (empty suite passes). Stitch design tokens are extracted into `tailwind.config.ts` and component mapping document is complete.
 
 ---
 
@@ -1187,21 +1191,21 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Working signup, login, Google OAuth, and route protection.
 
-| Task | Details |
-|---|---|
-| 1.1 | Configure NextAuth v5 with Prisma adapter |
-| 1.2 | Implement Credentials provider (email + bcrypt password) |
-| 1.3 | Implement Google OAuth provider |
-| 1.4 | Create signup page + form (React Hook Form + Zod) |
-| 1.5 | Create login page + form |
-| 1.6 | Add "Sign in with Google" button component |
-| 1.7 | Implement auth middleware (protect all `(dashboard)` routes) |
-| 1.8 | Handle account linking (Google + existing email) |
-| 1.9 | Add rate limiting on auth endpoints (5/min/IP) |
-| 1.10 | Implement logout flow |
-| 1.11 | Add form animations with Framer Motion |
-| 1.12 | Seed default categories on first user creation |
-| 1.13 | Write integration tests for signup/login/OAuth flows |
+| Task | Details                                                                              |
+| ---- | ------------------------------------------------------------------------------------ |
+| 1.1  | Configure NextAuth v5 with Prisma adapter                                            |
+| 1.2  | Implement Credentials provider (email + bcrypt password)                             |
+| 1.3  | Implement Google OAuth provider                                                      |
+| 1.4  | Create signup page + form (React Hook Form + Zod) — match `Login.html` Stitch mockup |
+| 1.5  | Create login page + form — match `Login.html` Stitch mockup                          |
+| 1.6  | Add "Sign in with Google" button component                                           |
+| 1.7  | Implement auth middleware (protect all `(dashboard)` routes)                         |
+| 1.8  | Handle account linking (Google + existing email)                                     |
+| 1.9  | Add rate limiting on auth endpoints (5/min/IP)                                       |
+| 1.10 | Implement logout flow                                                                |
+| 1.11 | Add form animations with Framer Motion                                               |
+| 1.12 | Seed default categories on first user creation                                       |
+| 1.13 | Write integration tests for signup/login/OAuth flows                                 |
 
 **Acceptance:** User can sign up, log in, and access Dashboard. Unauthenticated users are redirected. Google OAuth creates/links accounts correctly.
 
@@ -1211,27 +1215,27 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Full Kanban board experience with expense CRUD and drag-and-drop.
 
-| Task | Details |
-|---|---|
-| 2.1 | Implement `account.router` (CRUD for bank accounts) |
-| 2.2 | Build bank account management UI (settings page) |
-| 2.3 | Implement `board.router` (CRUD for boards) |
-| 2.4 | Build board list page with board cards (grid layout) |
-| 2.5 | Build Kanban board view with three columns |
-| 2.6 | Implement `expense.router` (CRUD + status update + reorder) |
-| 2.7 | Build expense card component with all fields |
-| 2.8 | Build expense form modal (React Hook Form + Zod) |
-| 2.9 | Implement tax calculation (auto-calculate taxAmount from rate) |
-| 2.10 | Integrate @dnd-kit for drag-and-drop between columns |
-| 2.11 | Implement optimistic updates for drag-and-drop |
-| 2.12 | Build board filter bar (category, date, tax, amount) |
-| 2.13 | Build board-level analytics panel (pie chart, trend, tax total) |
-| 2.14 | Add Framer Motion animations (card mount, column transitions) |
-| 2.15 | Implement mobile responsive layout (stacked columns / tabs) |
-| 2.16 | Connect expense mutations → BullMQ analytics queue |
-| 2.17 | Write unit tests for tax calculation logic |
-| 2.18 | Write integration tests for expense CRUD |
-| 2.19 | Write E2E test: create board → add expense → drag to Spent |
+| Task | Details                                                                                        |
+| ---- | ---------------------------------------------------------------------------------------------- |
+| 2.1  | Implement `account.router` (CRUD for bank accounts)                                            |
+| 2.2  | Build bank account management UI (settings page)                                               |
+| 2.3  | Implement `board.router` (CRUD for boards)                                                     |
+| 2.4  | Build board list page with board cards (grid layout) — match `KanBanBoards.html` Stitch mockup |
+| 2.5  | Build Kanban board view with three columns — match `KanBanBoards.html` Stitch mockup           |
+| 2.6  | Implement `expense.router` (CRUD + status update + reorder)                                    |
+| 2.7  | Build expense card component with all fields                                                   |
+| 2.8  | Build expense form modal (React Hook Form + Zod)                                               |
+| 2.9  | Implement tax calculation (auto-calculate taxAmount from rate)                                 |
+| 2.10 | Integrate @dnd-kit for drag-and-drop between columns                                           |
+| 2.11 | Implement optimistic updates for drag-and-drop                                                 |
+| 2.12 | Build board filter bar (category, date, tax, amount)                                           |
+| 2.13 | Build board-level analytics panel (pie chart, trend, tax total)                                |
+| 2.14 | Add Framer Motion animations (card mount, column transitions)                                  |
+| 2.15 | Implement mobile responsive layout (stacked columns / tabs)                                    |
+| 2.16 | Connect expense mutations → BullMQ analytics queue                                             |
+| 2.17 | Write unit tests for tax calculation logic                                                     |
+| 2.18 | Write integration tests for expense CRUD                                                       |
+| 2.19 | Write E2E test: create board → add expense → drag to Spent                                     |
 
 **Acceptance:** User can create boards linked to accounts, add/edit/delete expenses, drag between columns, filter, and see board analytics. All changes persist and trigger async jobs.
 
@@ -1241,22 +1245,22 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Full analytics dashboard with charts, tax summary, and export.
 
-| Task | Details |
-|---|---|
-| 3.1 | Implement `analytics.router` (all query procedures) |
-| 3.2 | Implement `analytics.service` (aggregation queries with Prisma) |
-| 3.3 | Add Redis caching to all analytics queries (5-min TTL) |
-| 3.4 | Build monthly comparison bar chart (Recharts) |
-| 3.5 | Build category breakdown donut chart (Recharts) |
-| 3.6 | Build tax aggregation summary cards + expense table |
-| 3.7 | Implement anomaly detection logic (≥ 2× category average) |
-| 3.8 | Build anomaly list component with warning badges |
-| 3.9 | Implement CSV export (PapaParse) |
-| 3.10 | Implement PDF export (jsPDF + autotable) |
-| 3.11 | Build export dialog with scope selection |
-| 3.12 | Add chart animations (Framer Motion wrapper) |
-| 3.13 | Write unit tests for analytics service calculations |
-| 3.14 | Write integration tests for analytics endpoints (with cached/uncached paths) |
+| Task | Details                                                                                        |
+| ---- | ---------------------------------------------------------------------------------------------- |
+| 3.1  | Implement `analytics.router` (all query procedures)                                            |
+| 3.2  | Implement `analytics.service` (aggregation queries with Prisma)                                |
+| 3.3  | Add Redis caching to all analytics queries (5-min TTL)                                         |
+| 3.4  | Build monthly comparison bar chart (Recharts) — match `DetailedAnalytics.html` Stitch mockup   |
+| 3.5  | Build category breakdown donut chart (Recharts) — match `DetailedAnalytics.html` Stitch mockup |
+| 3.6  | Build tax aggregation summary cards + expense table                                            |
+| 3.7  | Implement anomaly detection logic (≥ 2× category average)                                      |
+| 3.8  | Build anomaly list component with warning badges                                               |
+| 3.9  | Implement CSV export (PapaParse)                                                               |
+| 3.10 | Implement PDF export (jsPDF + autotable)                                                       |
+| 3.11 | Build export dialog with scope selection                                                       |
+| 3.12 | Add chart animations (Framer Motion wrapper)                                                   |
+| 3.13 | Write unit tests for analytics service calculations                                            |
+| 3.14 | Write integration tests for analytics endpoints (with cached/uncached paths)                   |
 
 **Acceptance:** Analytics tab shows all four sections with real data. Charts animate in. Export generates correct CSV/PDF files. Cache invalidation works correctly.
 
@@ -1266,20 +1270,20 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Investment portfolio tracking and net worth timeline.
 
-| Task | Details |
-|---|---|
-| 4.1 | Implement `investment.router` (CRUD + portfolio + netWorth) |
-| 4.2 | Build investment form modal |
-| 4.3 | Build portfolio overview (summary cards + allocation donut) |
-| 4.4 | Build investment list with sortable columns |
-| 4.5 | Implement inline current value editing |
-| 4.6 | Implement bulk value update by asset type |
-| 4.7 | Build net worth over time line chart |
-| 4.8 | Implement net worth snapshot cron job (BullMQ) |
-| 4.9 | Add Redis caching for portfolio + net worth queries |
-| 4.10 | Add Framer Motion animations for charts and cards |
-| 4.11 | Write integration tests for investment CRUD |
-| 4.12 | Write E2E test: add investment → view portfolio → update value |
+| Task | Details                                                                                                     |
+| ---- | ----------------------------------------------------------------------------------------------------------- |
+| 4.1  | Implement `investment.router` (CRUD + portfolio + netWorth)                                                 |
+| 4.2  | Build investment form modal                                                                                 |
+| 4.3  | Build portfolio overview (summary cards + allocation donut) — match `InvestmentNetWorth.html` Stitch mockup |
+| 4.4  | Build investment list with sortable columns                                                                 |
+| 4.5  | Implement inline current value editing                                                                      |
+| 4.6  | Implement bulk value update by asset type                                                                   |
+| 4.7  | Build net worth over time line chart                                                                        |
+| 4.8  | Implement net worth snapshot cron job (BullMQ)                                                              |
+| 4.9  | Add Redis caching for portfolio + net worth queries                                                         |
+| 4.10 | Add Framer Motion animations for charts and cards                                                           |
+| 4.11 | Write integration tests for investment CRUD                                                                 |
+| 4.12 | Write E2E test: add investment → view portfolio → update value                                              |
 
 **Acceptance:** User can manage investments, see portfolio allocation, track gain/loss, and view net worth trend over time.
 
@@ -1289,25 +1293,25 @@ process.on("SIGTERM", async () => {
 
 **Goal:** AI-powered insights, suggestions, and auto-categorization.
 
-| Task | Details |
-|---|---|
-| 5.1 | Set up Anthropic Claude client (`src/server/ai/client.ts`) |
-| 5.2 | Build prompt templates for all 5 AI features |
-| 5.3 | Build Zod schemas for AI response validation |
-| 5.4 | Implement `insight.router` |
-| 5.5 | Implement insight generation BullMQ worker |
-| 5.6 | Build AI Insights tab: monthly summary card |
-| 5.7 | Build cost reduction suggestions list (with dismiss) |
-| 5.8 | Build investment suggestions section (with disclaimer) |
-| 5.9 | Build anomaly alerts with natural language explanations |
-| 5.10 | Implement auto-categorization (suggestions on expense title input) |
-| 5.11 | Build Dashboard AI insight summary card |
-| 5.12 | Add "Regenerate" with rate limiting (1/hour) |
-| 5.13 | Implement graceful AI fallback (app works without AI) |
-| 5.14 | Add AI result caching (Redis, 1-hour TTL) |
-| 5.15 | Add AI token usage logging |
-| 5.16 | Write unit tests for prompt builders and response validators |
-| 5.17 | Write integration tests for insight generation pipeline |
+| Task | Details                                                                                       |
+| ---- | --------------------------------------------------------------------------------------------- |
+| 5.1  | Set up Anthropic Claude client (`src/server/ai/client.ts`)                                    |
+| 5.2  | Build prompt templates for all 5 AI features                                                  |
+| 5.3  | Build Zod schemas for AI response validation                                                  |
+| 5.4  | Implement `insight.router`                                                                    |
+| 5.5  | Implement insight generation BullMQ worker                                                    |
+| 5.6  | Build AI Insights tab: monthly summary card — match `AllInsightsDashboard.html` Stitch mockup |
+| 5.7  | Build cost reduction suggestions list (with dismiss)                                          |
+| 5.8  | Build investment suggestions section (with disclaimer)                                        |
+| 5.9  | Build anomaly alerts with natural language explanations                                       |
+| 5.10 | Implement auto-categorization (suggestions on expense title input)                            |
+| 5.11 | Build Dashboard AI insight summary card                                                       |
+| 5.12 | Add "Regenerate" with rate limiting (1/hour)                                                  |
+| 5.13 | Implement graceful AI fallback (app works without AI)                                         |
+| 5.14 | Add AI result caching (Redis, 1-hour TTL)                                                     |
+| 5.15 | Add AI token usage logging                                                                    |
+| 5.16 | Write unit tests for prompt builders and response validators                                  |
+| 5.17 | Write integration tests for insight generation pipeline                                       |
 
 **Acceptance:** AI insights generate correctly, display in the UI, and degrade gracefully when Claude is unavailable. Auto-categorization suggests relevant categories.
 
@@ -1317,23 +1321,23 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Notification system and polished Dashboard.
 
-| Task | Details |
-|---|---|
-| 6.1 | Implement `notification.router` |
-| 6.2 | Build notification bell icon with unread badge |
-| 6.3 | Build notification dropdown/panel |
-| 6.4 | Build notification item component (with click-to-navigate) |
-| 6.5 | Implement overspend check in analytics worker |
-| 6.6 | Implement bill reminder cron job |
-| 6.7 | Implement monthly summary notification cron |
-| 6.8 | Build Dashboard: summary cards with comparison indicators |
-| 6.9 | Build Dashboard: sparkline chart (Recharts) |
-| 6.10 | Build Dashboard: AI insight card (linked to insights tab) |
-| 6.11 | Build Dashboard: quick action buttons + modals |
-| 6.12 | Add notification preferences (opt-in/out) in settings |
-| 6.13 | Implement 30-day auto-archive for old notifications |
-| 6.14 | Write integration tests for notification triggers |
-| 6.15 | Write E2E test: exceed budget → receive overspend notification |
+| Task | Details                                                                                          |
+| ---- | ------------------------------------------------------------------------------------------------ |
+| 6.1  | Implement `notification.router`                                                                  |
+| 6.2  | Build notification bell icon with unread badge                                                   |
+| 6.3  | Build notification dropdown/panel                                                                |
+| 6.4  | Build notification item component (with click-to-navigate)                                       |
+| 6.5  | Implement overspend check in analytics worker                                                    |
+| 6.6  | Implement bill reminder cron job                                                                 |
+| 6.7  | Implement monthly summary notification cron                                                      |
+| 6.8  | Build Dashboard: summary cards with comparison indicators — match `Dashboard.html` Stitch mockup |
+| 6.9  | Build Dashboard: sparkline chart (Recharts) — match `Dashboard.html` Stitch mockup               |
+| 6.10 | Build Dashboard: AI insight card (linked to insights tab)                                        |
+| 6.11 | Build Dashboard: quick action buttons + modals                                                   |
+| 6.12 | Add notification preferences (opt-in/out) in settings                                            |
+| 6.13 | Implement 30-day auto-archive for old notifications                                              |
+| 6.14 | Write integration tests for notification triggers                                                |
+| 6.15 | Write E2E test: exceed budget → receive overspend notification                                   |
 
 **Acceptance:** Dashboard shows real-time aggregated data. Notifications fire correctly for overspend, reminders, and monthly summaries. Bell badge updates in real-time.
 
@@ -1343,30 +1347,30 @@ process.on("SIGTERM", async () => {
 
 **Goal:** Production-ready polish, performance, accessibility, and deployment.
 
-| Task | Details |
-|---|---|
-| 7.1 | Implement sidebar navigation (collapsible desktop, bottom mobile) |
-| 7.2 | Implement command palette (Ctrl+K) |
-| 7.3 | Implement all keyboard shortcuts |
-| 7.4 | Add page transitions (Framer Motion AnimatePresence) |
-| 7.5 | Audit and fix all loading states (skeleton components) |
-| 7.6 | Audit and fix all empty states (illustrations + CTAs) |
-| 7.7 | Audit and fix all error states (error boundaries) |
-| 7.8 | Add toast notifications (sonner) for all mutations |
-| 7.9 | Responsive design audit (375px–1440px) |
-| 7.10 | Accessibility audit (keyboard nav, ARIA, contrast) |
-| 7.11 | Performance audit (LCP, FID, CLS targets) |
-| 7.12 | Bundle size analysis (`@next/bundle-analyzer`) |
-| 7.13 | Configure Sentry for production (source maps, breadcrumbs) |
-| 7.14 | Write remaining E2E tests for critical flows |
-| 7.15 | Set up Vercel deployment (frontend) |
-| 7.16 | Set up Railway deployment (workers) |
-| 7.17 | Configure production environment variables |
-| 7.18 | Run full test suite — all tests must pass |
-| 7.19 | Create production deployment checklist |
-| 7.20 | Deploy to production |
+| Task | Details                                                                                             |
+| ---- | --------------------------------------------------------------------------------------------------- |
+| 7.1  | Implement sidebar navigation (collapsible desktop, bottom mobile)                                   |
+| 7.2  | Implement command palette (Ctrl+K)                                                                  |
+| 7.3  | Implement all keyboard shortcuts                                                                    |
+| 7.4  | Add page transitions (Framer Motion AnimatePresence)                                                |
+| 7.5  | Audit and fix all loading states (skeleton components must match Stitch card dimensions)            |
+| 7.6  | Audit and fix all empty states (illustrations + CTAs)                                               |
+| 7.7  | Audit and fix all error states (error boundaries)                                                   |
+| 7.8  | Add toast notifications (sonner) for all mutations                                                  |
+| 7.9  | Responsive design audit (375px–1440px) — ensure Stitch visual language preserved across breakpoints |
+| 7.10 | Accessibility audit (keyboard nav, ARIA, contrast)                                                  |
+| 7.11 | Performance audit (LCP, FID, CLS targets)                                                           |
+| 7.12 | Bundle size analysis (`@next/bundle-analyzer`)                                                      |
+| 7.13 | Configure Sentry for production (source maps, breadcrumbs)                                          |
+| 7.14 | Write remaining E2E tests for critical flows                                                        |
+| 7.15 | Set up Vercel deployment (frontend)                                                                 |
+| 7.16 | Set up Railway deployment (workers)                                                                 |
+| 7.17 | Configure production environment variables                                                          |
+| 7.18 | Run full test suite — all tests must pass                                                           |
+| 7.19 | Create production deployment checklist                                                              |
+| 7.20 | Deploy to production                                                                                |
 
-**Acceptance:** All Core Web Vitals meet targets. All E2E tests pass. Zero unhandled errors in Sentry. Production deployment is live and functional.
+**Acceptance:** All Core Web Vitals meet targets. All E2E tests pass. Zero unhandled errors in Sentry. Production deployment is live and functional. All pages match Stitch mockups pixel-perfectly in layout, spacing, and hierarchy.
 
 ---
 
@@ -1533,14 +1537,14 @@ npx prisma migrate deploy
 
 ### Scaling Considerations (Post-Launch)
 
-| Concern | Strategy |
-|---|---|
-| Database connections | Use Neon serverless driver with connection pooling (PgBouncer) |
-| Redis throughput | Upstash auto-scales; monitor via Upstash dashboard |
-| Worker scaling | Railway supports horizontal scaling; add replicas if job queue depth > 100 |
-| AI rate limiting | Implement token bucket in Redis; monitor Claude usage dashboard |
-| Bundle size | Code-split heavy chart libraries; lazy-load analytics/investments tabs |
-| Image optimization | Use `next/image` for all user uploads (future) |
+| Concern              | Strategy                                                                   |
+| -------------------- | -------------------------------------------------------------------------- |
+| Database connections | Use Neon serverless driver with connection pooling (PgBouncer)             |
+| Redis throughput     | Upstash auto-scales; monitor via Upstash dashboard                         |
+| Worker scaling       | Railway supports horizontal scaling; add replicas if job queue depth > 100 |
+| AI rate limiting     | Implement token bucket in Redis; monitor Claude usage dashboard            |
+| Bundle size          | Code-split heavy chart libraries; lazy-load analytics/investments tabs     |
+| Image optimization   | Use `next/image` for all user uploads (future)                             |
 
 ---
 
@@ -1627,9 +1631,9 @@ User visits AI Insights tab (or clicks "Regenerate")
 export function buildMonthlySummaryPrompt(data: {
   month: string;
   year: number;
-  totalSpent: number;       // in rupees (converted from paise)
+  totalSpent: number; // in rupees (converted from paise)
   totalIncome: number;
-  savingsRate: number;       // percentage
+  savingsRate: number; // percentage
   topCategories: Array<{ name: string; amount: number; change: number }>;
   investmentGainLoss: number;
   totalTaxPaid: number;
@@ -1644,7 +1648,7 @@ DATA:
 - Total income: ₹${data.totalIncome.toLocaleString()}
 - Savings rate: ${data.savingsRate}%
 - Top spending categories:
-${data.topCategories.map(c => `  - ${c.name}: ₹${c.amount.toLocaleString()} (${c.change > 0 ? '+' : ''}${c.change}% vs last month)`).join('\n')}
+${data.topCategories.map((c) => `  - ${c.name}: ₹${c.amount.toLocaleString()} (${c.change > 0 ? "+" : ""}${c.change}% vs last month)`).join("\n")}
 - Investment gain/loss: ₹${data.investmentGainLoss.toLocaleString()}
 - Total tax paid: ₹${data.totalTaxPaid.toLocaleString()}
 - Spending anomalies detected: ${data.anomalyCount}
@@ -1673,12 +1677,17 @@ export const monthlySummaryResponseSchema = z.object({
 });
 
 export const costReductionResponseSchema = z.object({
-  suggestions: z.array(z.object({
-    description: z.string().min(10).max(500),
-    estimatedMonthlySavings: z.number().positive(),
-    difficulty: z.enum(["Easy", "Medium", "Hard"]),
-    category: z.string().optional(),
-  })).min(1).max(10),
+  suggestions: z
+    .array(
+      z.object({
+        description: z.string().min(10).max(500),
+        estimatedMonthlySavings: z.number().positive(),
+        difficulty: z.enum(["Easy", "Medium", "Hard"]),
+        category: z.string().optional(),
+      }),
+    )
+    .min(1)
+    .max(10),
 });
 
 export const categorizationResponseSchema = z.object({
@@ -1700,10 +1709,7 @@ const amountInPaise = Math.round(userInputInRupees * 100);
 // ALWAYS display via utility
 import { formatCurrency } from "@/lib/format-currency";
 
-export function formatCurrency(
-  amountInPaise: number,
-  currency: string = "INR"
-): string {
+export function formatCurrency(amountInPaise: number, currency: string = "INR"): string {
   const amount = amountInPaise / 100;
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -1769,5 +1775,5 @@ export class ErrorBoundary extends Component<Props, State> {
 
 ---
 
-*Last updated: 2026-03-30*
-*Version: 1.0.0*
+_Last updated: 2026-03-30_
+_Version: 1.1.0 — Added Stitch design integration, UI implementation strategy, and mockup-driven task references_
