@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { AlertTriangle, X } from "lucide-react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import type { ExpenseStatus } from "@/components/boards/kanban-board";
@@ -35,7 +36,27 @@ type ExpenseFormProps = {
   submitLabel?: string;
 };
 
-const STATUS_OPTIONS: ExpenseStatus[] = ["PLANNED", "SPENT", "RECURRING"];
+const STATUS_OPTIONS: { value: ExpenseStatus; label: string }[] = [
+  { value: "PLANNED", label: "Planned" },
+  { value: "SPENT", label: "Spent" },
+  { value: "RECURRING", label: "Recurring" }
+];
+
+const TAX_OPTIONS = [
+  { value: "NONE", label: "None" },
+  { value: "GST", label: "GST" },
+  { value: "TDS", label: "TDS" },
+  { value: "CUSTOM", label: "Custom" }
+];
+
+const inputClassName =
+  "w-full border-b border-[#464554] bg-[#1A1B20] px-1 py-3 text-sm text-[#E3E2E8] tabular-nums placeholder:text-[#908FA0] transition-all duration-300 focus:border-[#6366F1] focus:bg-[#292A2E] focus:outline-none";
+
+const selectClassName =
+  "w-full border-b border-[#464554] bg-[#1A1B20] px-1 py-3 text-sm text-[#E3E2E8] transition-all duration-300 focus:border-[#6366F1] focus:bg-[#292A2E] focus:outline-none appearance-none cursor-pointer";
+
+const labelClassName =
+  "ml-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#C7C4D7]";
 
 export function ExpenseForm({
   open,
@@ -62,6 +83,15 @@ export function ExpenseForm({
   });
 
   const watchedTaxType = form.watch("taxType");
+  const watchedTaxRate = form.watch("taxRate");
+  const watchedAmount = form.watch("amount");
+
+  const computedTaxAmount = useMemo(() => {
+    if (watchedTaxType === "NONE" || !watchedTaxRate || !watchedAmount) return 0;
+    return (watchedAmount * watchedTaxRate) / 100;
+  }, [watchedTaxType, watchedTaxRate, watchedAmount]);
+
+  const showTaxRateWarning = watchedTaxType !== "NONE" && watchedTaxRate === 0;
 
   useEffect(() => {
     if (open) {
@@ -85,6 +115,15 @@ export function ExpenseForm({
     onClose();
   });
 
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open ? (
@@ -92,174 +131,220 @@ export function ExpenseForm({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-8"
           onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 18, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="w-full max-w-xl rounded-lg border border-white/10 bg-surface-low/90 p-6 backdrop-blur-glass"
-            onClick={(event) => event.stopPropagation()}
+            exit={{ opacity: 0, y: 24, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="glass-card w-full max-w-xl rounded-xl p-6"
+            onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-label="Expense form"
           >
-            <div className="mb-5">
-              <h2 className="text-lg font-semibold text-foreground">Expense</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Add a card to your active board and assign it to a column.</p>
+            {/* Header */}
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-bold text-[#E3E2E8]">New Expense</h2>
+                <p className="mt-1 text-xs text-[#908FA0]">
+                  Add a card to your active board and assign it to a column.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-[#908FA0] hover:text-white transition-colors p-1"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-1">
-                  <label htmlFor="title" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {/* Title + Amount */}
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-title" className={labelClassName}>
                     Title
                   </label>
                   <input
-                    id="title"
+                    id="expense-title"
                     type="text"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    placeholder="Server Infrastructure"
+                    className={inputClassName}
                     {...form.register("title")}
+                    aria-invalid={Boolean(form.formState.errors.title)}
                   />
-                  {form.formState.errors.title ? <p className="text-xs text-danger">{form.formState.errors.title.message}</p> : null}
+                  {form.formState.errors.title ? (
+                    <p className="text-xs text-[#FFB3AD]">{form.formState.errors.title.message}</p>
+                  ) : null}
                 </div>
 
-                <div className="space-y-1">
-                  <label htmlFor="amount" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                    Amount
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-amount" className={labelClassName}>
+                    Amount (₹)
                   </label>
                   <input
-                    id="amount"
+                    id="expense-amount"
                     type="number"
                     step="0.01"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    placeholder="0.00"
+                    className={inputClassName}
                     {...form.register("amount")}
+                    aria-invalid={Boolean(form.formState.errors.amount)}
                   />
-                  {form.formState.errors.amount ? <p className="text-xs text-danger">{form.formState.errors.amount.message}</p> : null}
+                  {form.formState.errors.amount ? (
+                    <p className="text-xs text-[#FFB3AD]">{form.formState.errors.amount.message}</p>
+                  ) : null}
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-1">
-                  <label htmlFor="categoryId" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {/* Category + Status */}
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-category" className={labelClassName}>
                     Category
                   </label>
                   <select
-                    id="categoryId"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    id="expense-category"
+                    className={selectClassName}
                     {...form.register("categoryId")}
                   >
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label htmlFor="status" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                    Status
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-status" className={labelClassName}>
+                    Column
                   </label>
                   <select
-                    id="status"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    id="expense-status"
+                    className={selectClassName}
                     {...form.register("status")}
                   >
-                    {STATUS_OPTIONS.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
+                    {STATUS_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-1">
-                  <label htmlFor="date" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {/* Date + Tax Type + Tax Rate */}
+              <div className="grid gap-5 md:grid-cols-3">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-date" className={labelClassName}>
                     Date
                   </label>
                   <input
-                    id="date"
+                    id="expense-date"
                     type="date"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    className={inputClassName}
                     {...form.register("date")}
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label htmlFor="taxType" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-tax-type" className={labelClassName}>
                     Tax Type
                   </label>
                   <select
-                    id="taxType"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    id="expense-tax-type"
+                    className={selectClassName}
                     {...form.register("taxType")}
                   >
-                    <option value="NONE">None</option>
-                    <option value="GST">GST</option>
-                    <option value="TDS">TDS</option>
-                    <option value="CUSTOM">Custom</option>
+                    {TAX_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label htmlFor="taxRate" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-tax-rate" className={labelClassName}>
                     Tax Rate %
                   </label>
                   <input
-                    id="taxRate"
+                    id="expense-tax-rate"
                     type="number"
                     step="0.1"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    placeholder="0"
+                    className={inputClassName}
                     {...form.register("taxRate")}
                   />
                 </div>
               </div>
 
+              {/* Tax warning + computed amount */}
+              {showTaxRateWarning ? (
+                <div className="flex items-center gap-2 text-xs text-[#FFB3AD]">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  Tax rate is 0%. Did you mean to select no tax?
+                </div>
+              ) : null}
+
+              {watchedTaxType !== "NONE" && computedTaxAmount > 0 ? (
+                <div className="flex items-center justify-between rounded-lg bg-[#292A2E]/60 px-3 py-2">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C7C4D7]">
+                    Computed Tax
+                  </span>
+                  <span className="text-sm font-bold tabular-nums text-[#FFB3AD]">
+                    ₹{computedTaxAmount.toFixed(2)}
+                  </span>
+                </div>
+              ) : null}
+
+              {/* Custom Tax Label */}
               {watchedTaxType === "CUSTOM" ? (
-                <div className="space-y-1">
-                  <label
-                    htmlFor="customTaxLabel"
-                    className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
-                  >
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="expense-custom-tax" className={labelClassName}>
                     Custom Tax Label
                   </label>
                   <input
-                    id="customTaxLabel"
+                    id="expense-custom-tax"
                     type="text"
-                    className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                    placeholder="e.g. Service Tax"
+                    className={inputClassName}
                     {...form.register("customTaxLabel")}
                   />
                 </div>
               ) : null}
 
-              <div className="space-y-1">
-                <label htmlFor="notes" className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {/* Notes */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="expense-notes" className={labelClassName}>
                   Notes
                 </label>
                 <textarea
-                  id="notes"
-                  rows={3}
-                  className="w-full rounded-sm border border-white/10 bg-surface-high px-3 py-2 text-sm text-foreground outline-none ring-0 transition-colors focus:border-primary/60"
+                  id="expense-notes"
+                  rows={2}
+                  placeholder="Optional notes..."
+                  className={[inputClassName, "resize-none"].join(" ")}
                   {...form.register("notes")}
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-sm border border-white/10 bg-surface-high px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-highest"
+                  className="px-4 py-2.5 text-sm font-semibold text-[#C7C4D7] hover:text-white transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition-opacity hover:opacity-90"
+                  className="rounded-lg bg-gradient-to-r from-[#6366F1] to-[#4F46E5] px-5 py-2.5 text-sm font-bold text-[#1000A9] shadow-[0_4px_12px_rgba(99,102,241,0.2)] transition-all duration-300 hover:opacity-95 active:scale-[0.98]"
                 >
                   {submitLabel}
                 </button>
