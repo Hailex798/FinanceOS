@@ -34,8 +34,14 @@ finance-os/
 ├── .specify/
 │   └── memory/
 │       └── constitution.md
+├── archive/                              # Archive of future specifications (ignore for now)
+│   └── 002-finance-os/
+│       ├── DESIGN.md                     
+│       ├── spec.md
+│       └── plan.md
+|       └── constitution.md
 ├── specs/
-│   └── main/
+│   └── 001-finance-os/
 │       ├── DESIGN.md                     # Stitch design tokens, color system, typography, layout rules
 │       ├── spec.md
 │       └── plan.md

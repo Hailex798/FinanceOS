@@ -1,0 +1,269 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  emailVerified      DateTime?
+  name               String?
+  image              String?
+  passwordHash       String?
+  currency           String             @default("INR")
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  authAccounts       Account[]
+  sessions           Session[]
+  bankAccounts       BankAccount[]
+  boards             Board[]
+  categories         Category[]
+  investments        Investment[]
+  aiInsights         AIInsight[]
+  notifications      Notification[]
+  netWorthSnapshots  NetWorthSnapshot[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("auth_accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum AccountType {
+  SAVINGS
+  CURRENT
+  CREDIT_CARD
+  WALLET
+}
+
+model BankAccount {
+  id          String      @id @default(cuid())
+  userId      String
+  name        String
+  bankName    String
+  accountType AccountType
+  color       String      @default("#6366f1")
+  icon        String      @default("bank")
+  balance     Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  boards Board[]
+
+  @@index([userId])
+  @@map("bank_accounts")
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  userId    String
+  accountId String
+  name      String
+  month     Int
+  year      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account BankAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+
+  @@unique([userId, accountId, month, year])
+  @@index([userId])
+  @@index([accountId])
+  @@map("boards")
+}
+
+enum ExpenseStatus {
+  PLANNED
+  SPENT
+  RECURRING
+}
+
+enum TaxType {
+  NONE
+  GST
+  TDS
+  CUSTOM
+}
+
+model Expense {
+  id             String        @id @default(cuid())
+  boardId        String
+  categoryId     String
+  title          String
+  amount         Int
+  status         ExpenseStatus @default(PLANNED)
+  date           DateTime      @default(now())
+  notes          String?       @db.Text
+  taxType        TaxType       @default(NONE)
+  taxRate        Float         @default(0)
+  taxAmount      Int           @default(0)
+  customTaxLabel String?
+  sortOrder      Int           @default(0)
+  dueDate        DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  board    Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@index([boardId])
+  @@index([boardId, status])
+  @@index([categoryId])
+  @@index([date])
+  @@map("expenses")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  color       String   @default("#6366f1")
+  icon        String   @default("tag")
+  budgetLimit Int?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("categories")
+}
+
+enum InvestmentType {
+  STOCKS
+  MUTUAL_FUNDS
+  CRYPTO
+  FD
+  PPF
+  GOLD
+  REAL_ESTATE
+}
+
+model Investment {
+  id             String         @id @default(cuid())
+  userId         String
+  type           InvestmentType
+  assetName      String
+  investedAmount Int
+  currentValue   Int
+  date           DateTime
+  notes          String?        @db.Text
+  lastUpdated    DateTime       @default(now())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, type])
+  @@map("investments")
+}
+
+model AIInsight {
+  id                    String   @id @default(cuid())
+  userId                String
+  month                 Int
+  year                  Int
+  summary               String   @db.Text
+  suggestions           Json
+  investmentSuggestions Json?
+  anomalies             Json?
+  generatedAt           DateTime @default(now())
+  expiresAt             DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@index([userId])
+  @@map("ai_insights")
+}
+
+enum NotificationType {
+  OVERSPEND_WARNING
+  OVERSPEND_ALERT
+  BILL_REMINDER
+  MONTHLY_SUMMARY
+  ANOMALY_ALERT
+  AI_INSIGHT_READY
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  isRead    Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model NetWorthSnapshot {
+  id               String   @id @default(cuid())
+  userId           String
+  month            Int
+  year             Int
+  totalAccounts    Int
+  totalInvestments Int
+  netWorth         Int
+  snapshotDate     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@index([userId])
+  @@map("net_worth_snapshots")
+}

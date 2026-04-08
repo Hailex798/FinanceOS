@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 228 16% 8%;
+  --foreground: 225 29% 95%;
+  --card: 226 17% 12%;
+  --card-foreground: 225 29% 95%;
+  --popover: 226 17% 12%;
+  --popover-foreground: 225 29% 95%;
+  --primary: 239 100% 88%;
+  --primary-foreground: 228 16% 8%;
+  --secondary: 154 70% 58%;
+  --secondary-foreground: 228 16% 8%;
+  --muted: 225 15% 20%;
+  --muted-foreground: 226 10% 71%;
+  --accent: 225 15% 20%;
+  --accent-foreground: 225 29% 95%;
+  --destructive: 5 100% 84%;
+  --destructive-foreground: 228 16% 8%;
+  --border: 0 0% 100% / 0.14;
+  --input: 0 0% 100% / 0.12;
+  --ring: 239 68% 64%;
+  --success: 154 70% 58%;
+  --danger: 5 100% 84%;
+  --surface-lowest: 226 14% 6%;
+  --surface-base: 228 16% 8%;
+  --surface-low: 226 16% 12%;
+  --surface-high: 226 16% 16%;
+  --surface-highest: 226 17% 20%;
+}
+
+* {
+  @apply border-border;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-background text-foreground;
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.glass-card {
+  background: linear-gradient(
+    160deg,
+    hsl(var(--surface-highest) / 0.62),
+    hsl(var(--surface-low) / 0.62)
+  );
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 50px -24px rgba(5, 8, 16, 0.75);
+}
+
